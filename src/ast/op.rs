@@ -1,32 +1,36 @@
 #![allow(dead_code)]
 
 use super::smart_num::SmartNum;
-use std::fmt::Display;
+use std::{fmt::Display, panic};
 
 #[derive(Debug, Clone)]
-pub enum AstOperatorType {
-    Neg,
-    Add,
-    Sub,
-    Mul,
-    Div,
+pub struct AstOperatorBase {
+    name: &'static str,
+    priority: u32,
 }
 
 #[derive(Debug, Clone)]
-pub struct AstOperator {
-    pub priority: u32,
-    pub op_type: AstOperatorType,
+pub enum AstOperator {
+    Neg(AstOperatorBase),
+    Add(AstOperatorBase),
+    Sub(AstOperatorBase),
+    Mul(AstOperatorBase),
+    Div(AstOperatorBase),
 }
 
 impl AstOperator {
-    pub fn to_string(&self) -> String {
-        match &self.op_type {
-            AstOperatorType::Neg => String::from("-"),
-            AstOperatorType::Add => String::from("+"),
-            AstOperatorType::Sub => String::from("-"),
-            AstOperatorType::Mul => String::from("*"),
-            AstOperatorType::Div => String::from("/"),
+    fn to_base(&self) -> &AstOperatorBase {
+        match self {
+            Self::Neg(op) | Self::Add(op) | Self::Sub(op) | Self::Mul(op) | Self::Div(op) => op,
         }
+    }
+
+    pub fn to_string(&self) -> &str {
+        self.to_base().name
+    }
+
+    pub fn priority(&self) -> u32 {
+        self.to_base().priority.clone()
     }
 }
 
@@ -36,30 +40,30 @@ impl Display for AstOperator {
     }
 }
 
-pub const OP_NEG: AstOperator = AstOperator {
+pub const OP_NEG: AstOperator = AstOperator::Neg(AstOperatorBase {
+    name: "-",
     priority: 1,
-    op_type: AstOperatorType::Neg,
-};
+});
 
-pub const OP_ADD: AstOperator = AstOperator {
+pub const OP_ADD: AstOperator = AstOperator::Add(AstOperatorBase {
+    name: "+",
     priority: 2,
-    op_type: AstOperatorType::Add,
-};
+});
 
-pub const OP_SUB: AstOperator = AstOperator {
+pub const OP_SUB: AstOperator = AstOperator::Sub(AstOperatorBase {
+    name: "-",
     priority: 2,
-    op_type: AstOperatorType::Sub,
-};
+});
 
-pub const OP_MUL: AstOperator = AstOperator {
+pub const OP_MUL: AstOperator = AstOperator::Mul(AstOperatorBase {
+    name: "*",
     priority: 3,
-    op_type: AstOperatorType::Mul,
-};
+});
 
-pub const OP_DIV: AstOperator = AstOperator {
+pub const OP_DIV: AstOperator = AstOperator::Div(AstOperatorBase {
+    name: "/",
     priority: 3,
-    op_type: AstOperatorType::Div,
-};
+});
 
 #[derive(Debug, Clone)]
 pub struct Variable {
@@ -85,11 +89,24 @@ impl AstOperand {
             name: name.to_string(),
         })
     }
+
+    pub fn to_smart_num(&self) -> SmartNum {
+        match self {
+            AstOperand::Num(num) => num.clone(),
+            _ => panic!("This is not a number!"),
+        }
+    }
 }
 
 impl Display for AstOperand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.to_string())
+    }
+}
+
+impl From<SmartNum> for AstOperand {
+    fn from(v: SmartNum) -> Self {
+        AstOperand::Num(v)
     }
 }
 
