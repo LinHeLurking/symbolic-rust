@@ -3,13 +3,13 @@
 use super::smart_num::SmartNum;
 use std::{fmt::Display, panic};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct AstOperatorBase {
     name: &'static str,
     priority: u32,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum AstOperator {
     Neg(AstOperatorBase),
     Add(AstOperatorBase),
@@ -32,6 +32,41 @@ impl AstOperator {
     pub fn priority(&self) -> u32 {
         self.to_base().priority.clone()
     }
+
+    pub fn gen_neg_op() -> AstOperator {
+        AstOperator::Neg(AstOperatorBase {
+            name: "-",
+            priority: 1,
+        })
+    }
+
+    pub fn gen_add_op() -> AstOperator {
+        AstOperator::Add(AstOperatorBase {
+            name: "+",
+            priority: 2,
+        })
+    }
+
+    pub fn gen_sub_op() -> AstOperator {
+        AstOperator::Sub(AstOperatorBase {
+            name: "-",
+            priority: 2,
+        })
+    }
+
+    pub fn gen_mul_op() -> AstOperator {
+        AstOperator::Mul(AstOperatorBase {
+            name: "*",
+            priority: 3,
+        })
+    }
+
+    pub fn gen_div_op() -> AstOperator {
+        AstOperator::Div(AstOperatorBase {
+            name: "/",
+            priority: 3,
+        })
+    }
 }
 
 impl Display for AstOperator {
@@ -40,34 +75,17 @@ impl Display for AstOperator {
     }
 }
 
-pub const OP_NEG: AstOperator = AstOperator::Neg(AstOperatorBase {
-    name: "-",
-    priority: 1,
-});
-
-pub const OP_ADD: AstOperator = AstOperator::Add(AstOperatorBase {
-    name: "+",
-    priority: 2,
-});
-
-pub const OP_SUB: AstOperator = AstOperator::Sub(AstOperatorBase {
-    name: "-",
-    priority: 2,
-});
-
-pub const OP_MUL: AstOperator = AstOperator::Mul(AstOperatorBase {
-    name: "*",
-    priority: 3,
-});
-
-pub const OP_DIV: AstOperator = AstOperator::Div(AstOperatorBase {
-    name: "/",
-    priority: 3,
-});
-
 #[derive(Debug, Clone)]
 pub struct Variable {
-    name: String,
+    pub(crate) name: String,
+}
+
+impl Variable {
+    pub fn new_variable(name: &str) -> Variable {
+        Variable {
+            name: name.to_string(),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -90,8 +108,15 @@ impl AstOperand {
         })
     }
 
-    pub fn to_smart_num(&self) -> SmartNum {
+    pub fn is_num(&self) -> bool {
         match self {
+            AstOperand::Num(_) => true,
+            AstOperand::Variable(_) => false,
+        }
+    }
+
+    pub fn to_smart_num(&self) -> SmartNum {
+        match &self {
             AstOperand::Num(num) => num.clone(),
             _ => panic!("This is not a number!"),
         }
@@ -174,11 +199,11 @@ impl From<i64> for AstOperand {
 #[test]
 fn operator_to_fmt() {
     let check_table = vec![
-        (OP_NEG, "-"),
-        (OP_ADD, "+"),
-        (OP_SUB, "-"),
-        (OP_MUL, "*"),
-        (OP_DIV, "/"),
+        (AstOperator::gen_neg_op(), "-"),
+        (AstOperator::gen_add_op(), "+"),
+        (AstOperator::gen_sub_op(), "-"),
+        (AstOperator::gen_mul_op(), "*"),
+        (AstOperator::gen_div_op(), "/"),
     ];
     for (op, expected) in check_table {
         assert_eq!(op.to_string(), expected);

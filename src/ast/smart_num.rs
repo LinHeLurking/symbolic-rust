@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use std::ops::{Add, Mul};
+use std::ops::{Add, Div, Mul, Sub};
 
 #[derive(Debug, Clone, Copy)]
 pub enum SmartNum {
@@ -19,15 +19,27 @@ impl SmartNum {
     pub fn to_i64(&self) -> i64 {
         match self {
             SmartNum::Integer(v) => *v,
-            _ => panic!("This is not i64!"),
+            SmartNum::Real(v) => *v as i64,
         }
     }
 
     pub fn to_f64(&self) -> f64 {
         match self {
             SmartNum::Real(v) => *v,
-            _ => panic!("This is not f64!"),
+            SmartNum::Integer(v) => *v as f64,
         }
+    }
+
+    pub fn near(&self, rhs: Self, eps: f64) -> bool {
+        return (self.to_f64() - rhs.to_f64()).abs() < eps;
+    }
+
+    pub fn zero() -> SmartNum {
+        SmartNum::from(0_i64)
+    }
+
+    pub fn one() -> SmartNum {
+        SmartNum::from(1_i64)
     }
 }
 
@@ -109,6 +121,23 @@ impl Add for SmartNum {
     }
 }
 
+impl Sub for SmartNum {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        match self {
+            SmartNum::Integer(i) => match rhs {
+                SmartNum::Integer(j) => SmartNum::Integer(i - j),
+                SmartNum::Real(j) => SmartNum::Real((i as f64) - j),
+            },
+            SmartNum::Real(i) => match rhs {
+                SmartNum::Integer(j) => SmartNum::Real(i - (j as f64)),
+                SmartNum::Real(j) => SmartNum::Real(i - j),
+            },
+        }
+    }
+}
+
 impl Mul for SmartNum {
     type Output = SmartNum;
 
@@ -121,6 +150,23 @@ impl Mul for SmartNum {
             SmartNum::Real(i) => match rhs {
                 SmartNum::Integer(j) => SmartNum::Real(i * (j as f64)),
                 SmartNum::Real(j) => SmartNum::Real(i * j),
+            },
+        }
+    }
+}
+
+impl Div for SmartNum {
+    type Output = SmartNum;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        match self {
+            SmartNum::Integer(i) => match rhs {
+                SmartNum::Integer(j) => SmartNum::Real((i as f64) / (j as f64)),
+                SmartNum::Real(j) => SmartNum::Real((i as f64) / (j as f64)),
+            },
+            SmartNum::Real(i) => match rhs {
+                SmartNum::Integer(j) => SmartNum::Real((i as f64) / (j as f64)),
+                SmartNum::Real(j) => SmartNum::Real((i as f64) / (j as f64)),
             },
         }
     }

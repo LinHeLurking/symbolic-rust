@@ -1,12 +1,21 @@
 #![allow(dead_code)]
 
 use super::{op::*, smart_num::SmartNum};
-use std::fmt::Display;
+use std::{
+    fmt::Display,
+    ops::{Add, Div, Mul, Neg, Sub},
+};
 
 #[derive(Debug, Clone)]
 pub enum AstNode {
     Operator(AstOperator),
     Operand(AstOperand),
+}
+
+impl From<SmartNum> for AstNode {
+    fn from(v: SmartNum) -> Self {
+        AstNode::Operand(AstOperand::from(v))
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -17,16 +26,30 @@ pub struct Expression {
 
 impl Expression {
     pub fn is_operator(&self) -> bool {
-        match self.me {
+        match &self.me {
             AstNode::Operator(_) => true,
             AstNode::Operand(_) => false,
         }
     }
 
     pub fn is_operand(&self) -> bool {
-        match self.me {
+        match &self.me {
             AstNode::Operator(_) => false,
             AstNode::Operand(_) => true,
+        }
+    }
+
+    pub fn is_num(&self) -> bool {
+        match &self.me {
+            AstNode::Operator(_) => false,
+            AstNode::Operand(operand) => operand.is_num(),
+        }
+    }
+
+    pub fn to_smart_num(&self) -> SmartNum {
+        match &self.me {
+            AstNode::Operator(_) => panic!("This is not a number node!"),
+            AstNode::Operand(operand) => operand.to_smart_num(),
         }
     }
 
@@ -39,23 +62,23 @@ impl Expression {
     }
 
     pub fn neg(self) -> Expression {
-        return Self::build(vec![self], OP_NEG);
+        return Self::build(vec![self], AstOperator::gen_neg_op());
     }
 
     pub fn add(self, rhs: Expression) -> Expression {
-        return Self::build(vec![self, rhs], OP_ADD);
+        return Self::build(vec![self, rhs], AstOperator::gen_add_op());
     }
 
     pub fn sub(self, rhs: Expression) -> Expression {
-        return Self::build(vec![self, rhs], OP_SUB);
+        return Self::build(vec![self, rhs], AstOperator::gen_sub_op());
     }
 
     pub fn mul(self, rhs: Expression) -> Expression {
-        return Self::build(vec![self, rhs], OP_MUL);
+        return Self::build(vec![self, rhs], AstOperator::gen_mul_op());
     }
 
     pub fn div(self, rhs: Expression) -> Expression {
-        return Self::build(vec![self, rhs], OP_DIV);
+        return Self::build(vec![self, rhs], AstOperator::gen_div_op());
     }
 
     pub fn new_variable(name: &str) -> Expression {
@@ -92,6 +115,46 @@ impl Expression {
 impl Display for Expression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.to_string())
+    }
+}
+
+impl Neg for Expression {
+    type Output = Expression;
+
+    fn neg(self) -> Self::Output {
+        self.neg()
+    }
+}
+
+impl Add for Expression {
+    type Output = Expression;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        self.add(rhs)
+    }
+}
+
+impl Sub for Expression {
+    type Output = Expression;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        self.sub(rhs)
+    }
+}
+
+impl Mul for Expression {
+    type Output = Expression;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        self.mul(rhs)
+    }
+}
+
+impl Div for Expression {
+    type Output = Expression;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        self.div(rhs)
     }
 }
 
