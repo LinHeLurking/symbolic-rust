@@ -31,7 +31,7 @@ impl AstNode {
     }
 
     // Factory methods
-    pub fn build(child: Vec<AstNode>, op_type: AstOperator) -> AstNode {
+    fn build(child: Vec<AstNode>, op_type: AstOperator) -> AstNode {
         return AstNode {
             me: AstNodeTag::Operator(op_type),
             child,
@@ -56,6 +56,13 @@ impl AstNode {
 
     pub fn div(self, rhs: AstNode) -> AstNode {
         return Self::build(vec![self, rhs], OP_DIV);
+    }
+
+    pub fn new_variable(name: &str) -> AstNode {
+        AstNode {
+            me: AstNodeTag::Operand(AstOperand::new_variable(name)),
+            child: vec![],
+        }
     }
 
     fn to_string_raw(&self, upper_priority: u32) -> String {
@@ -205,5 +212,11 @@ fn ast_fmt() {
         let expected = "3 * (1.000 + 2)";
         assert_eq!(d.to_string(), expected);
         assert_eq!(format!("{}", d), expected);
+    }
+    {
+        let a = AstNode::new_variable("x");
+        let expected = "x";
+        assert_eq!(a.to_string(), expected);
+        assert_eq!(format!("{}", a), expected);
     }
 }
