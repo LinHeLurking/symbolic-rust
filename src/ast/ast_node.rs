@@ -9,18 +9,6 @@ pub enum AstNodeTag {
     Operand(AstOperand),
 }
 
-impl From<i64> for AstNodeTag {
-    fn from(k: i64) -> Self {
-        AstNodeTag::Operand(AstOperand::from(k))
-    }
-}
-
-impl From<f64> for AstNodeTag {
-    fn from(f: f64) -> Self {
-        AstNodeTag::Operand(AstOperand::from(f))
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct AstNode {
     me: AstNodeTag,
@@ -100,19 +88,92 @@ impl Display for AstNode {
     }
 }
 
-impl From<i64> for AstNode {
-    fn from(k: i64) -> Self {
+// Automatically generated from python script.
+impl From<f32> for AstNode {
+    fn from(v: f32) -> Self {
         AstNode {
-            me: AstNodeTag::from(k),
+            me: AstNodeTag::Operand(AstOperand::from(v)),
             child: vec![],
         }
     }
 }
 
 impl From<f64> for AstNode {
-    fn from(f: f64) -> Self {
+    fn from(v: f64) -> Self {
         AstNode {
-            me: AstNodeTag::from(f),
+            me: AstNodeTag::Operand(AstOperand::from(v)),
+            child: vec![],
+        }
+    }
+}
+
+impl From<u8> for AstNode {
+    fn from(v: u8) -> Self {
+        AstNode {
+            me: AstNodeTag::Operand(AstOperand::from(v)),
+            child: vec![],
+        }
+    }
+}
+
+impl From<i8> for AstNode {
+    fn from(v: i8) -> Self {
+        AstNode {
+            me: AstNodeTag::Operand(AstOperand::from(v)),
+            child: vec![],
+        }
+    }
+}
+
+impl From<u16> for AstNode {
+    fn from(v: u16) -> Self {
+        AstNode {
+            me: AstNodeTag::Operand(AstOperand::from(v)),
+            child: vec![],
+        }
+    }
+}
+
+impl From<i16> for AstNode {
+    fn from(v: i16) -> Self {
+        AstNode {
+            me: AstNodeTag::Operand(AstOperand::from(v)),
+            child: vec![],
+        }
+    }
+}
+
+impl From<u32> for AstNode {
+    fn from(v: u32) -> Self {
+        AstNode {
+            me: AstNodeTag::Operand(AstOperand::from(v)),
+            child: vec![],
+        }
+    }
+}
+
+impl From<i32> for AstNode {
+    fn from(v: i32) -> Self {
+        AstNode {
+            me: AstNodeTag::Operand(AstOperand::from(v)),
+            child: vec![],
+        }
+    }
+}
+
+impl From<u64> for AstNode {
+    fn from(v: u64) -> Self {
+        AstNode {
+            me: AstNodeTag::Operand(AstOperand::from(v)),
+            child: vec![],
+        }
+    }
+}
+
+impl From<i64> for AstNode {
+    fn from(v: i64) -> Self {
+        AstNode {
+            me: AstNodeTag::Operand(AstOperand::from(v)),
             child: vec![],
         }
     }

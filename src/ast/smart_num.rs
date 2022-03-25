@@ -8,6 +8,29 @@ pub enum SmartNum {
     Real(f64),
 }
 
+impl SmartNum {
+    pub fn to_string(&self) -> String {
+        match self {
+            SmartNum::Integer(k) => format!("{}", k),
+            SmartNum::Real(f) => format!("{:.3}", f),
+        }
+    }
+
+    pub fn to_i64(&self) -> i64 {
+        match self {
+            SmartNum::Integer(v) => *v,
+            _ => panic!("This is not i64!"),
+        }
+    }
+
+    pub fn to_f64(&self) -> f64 {
+        match self {
+            SmartNum::Real(v) => *v,
+            _ => panic!("This is not f64!"),
+        }
+    }
+}
+
 impl From<i64> for SmartNum {
     fn from(v: i64) -> Self {
         SmartNum::Integer(v)
@@ -20,31 +43,53 @@ impl From<f64> for SmartNum {
     }
 }
 
-impl SmartNum {
-    pub fn to_i64(&self) -> i64 {
-        match self {
-            SmartNum::Integer(k) => k.clone(),
-            _ => panic!("Unreachable"),
-        }
-    }
-
-    pub fn to_f64(&self) -> f64 {
-        match self {
-            SmartNum::Real(f) => f.clone(),
-            _ => panic!("Unreachable"),
-        }
-    }
-
-    pub fn to_string(&self) -> String {
-        match self {
-            SmartNum::Integer(k) => format!("{}", k),
-            SmartNum::Real(f) => format!("{:.3}", f),
-        }
+impl From<f32> for SmartNum {
+    fn from(v: f32) -> Self {
+        SmartNum::Real(v as f64)
     }
 }
 
-fn is_close(a: f64, b: f64) -> bool {
-    return (a - b).abs() < 1e-9;
+// Automatically generated codes for other From<T>
+impl From<u8> for SmartNum {
+    fn from(v: u8) -> Self {
+        SmartNum::Integer(i64::from(v))
+    }
+}
+
+impl From<i8> for SmartNum {
+    fn from(v: i8) -> Self {
+        SmartNum::Integer(i64::from(v))
+    }
+}
+
+impl From<u16> for SmartNum {
+    fn from(v: u16) -> Self {
+        SmartNum::Integer(i64::from(v))
+    }
+}
+
+impl From<i16> for SmartNum {
+    fn from(v: i16) -> Self {
+        SmartNum::Integer(i64::from(v))
+    }
+}
+
+impl From<u32> for SmartNum {
+    fn from(v: u32) -> Self {
+        SmartNum::Integer(i64::from(v))
+    }
+}
+
+impl From<i32> for SmartNum {
+    fn from(v: i32) -> Self {
+        SmartNum::Integer(i64::from(v))
+    }
+}
+
+impl From<u64> for SmartNum {
+    fn from(v: u64) -> Self {
+        SmartNum::Integer(v as i64)
+    }
 }
 
 impl Add for SmartNum {
@@ -97,6 +142,10 @@ fn gen_double_range() -> Vec<(i64, i64)> {
         }
     }
     return rg;
+}
+
+fn is_close(a: f64, b: f64) -> bool {
+    return (a - b).abs() < 1e-9;
 }
 
 #[test]

@@ -73,15 +73,64 @@ impl AstOperand {
     }
 }
 
-impl From<i64> for AstOperand {
-    fn from(k: i64) -> Self {
-        AstOperand::Num(SmartNum::from(k))
+// Automatically generated from python script.
+impl From<f32> for AstOperand{
+    fn from(v: f32) -> Self {
+        AstOperand::Num(SmartNum::from(v))
     }
 }
 
-impl From<f64> for AstOperand {
-    fn from(f: f64) -> Self {
-        AstOperand::Num(SmartNum::from(f))
+impl From<f64> for AstOperand{
+    fn from(v: f64) -> Self {
+        AstOperand::Num(SmartNum::from(v))
+    }
+}
+
+impl From<u8> for AstOperand{
+    fn from(v: u8) -> Self {
+        AstOperand::Num(SmartNum::from(v))
+    }
+}
+
+impl From<i8> for AstOperand{
+    fn from(v: i8) -> Self {
+        AstOperand::Num(SmartNum::from(v))
+    }
+}
+
+impl From<u16> for AstOperand{
+    fn from(v: u16) -> Self {
+        AstOperand::Num(SmartNum::from(v))
+    }
+}
+
+impl From<i16> for AstOperand{
+    fn from(v: i16) -> Self {
+        AstOperand::Num(SmartNum::from(v))
+    }
+}
+
+impl From<u32> for AstOperand{
+    fn from(v: u32) -> Self {
+        AstOperand::Num(SmartNum::from(v))
+    }
+}
+
+impl From<i32> for AstOperand{
+    fn from(v: i32) -> Self {
+        AstOperand::Num(SmartNum::from(v))
+    }
+}
+
+impl From<u64> for AstOperand{
+    fn from(v: u64) -> Self {
+        AstOperand::Num(SmartNum::from(v))
+    }
+}
+
+impl From<i64> for AstOperand{
+    fn from(v: i64) -> Self {
+        AstOperand::Num(SmartNum::from(v))
     }
 }
 
