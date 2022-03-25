@@ -21,17 +21,24 @@ impl From<f64> for SmartNum {
 }
 
 impl SmartNum {
-    fn to_i64(&self) -> i64 {
+    pub fn to_i64(&self) -> i64 {
         match self {
             SmartNum::Integer(k) => k.clone(),
             _ => panic!("Unreachable"),
         }
     }
 
-    fn to_f64(&self) -> f64 {
+    pub fn to_f64(&self) -> f64 {
         match self {
             SmartNum::Real(f) => f.clone(),
             _ => panic!("Unreachable"),
+        }
+    }
+
+    pub fn to_string(&self) -> String {
+        match self {
+            SmartNum::Integer(k) => format!("{}", k),
+            SmartNum::Real(f) => format!("{:.3}", f),
         }
     }
 }
@@ -74,10 +81,18 @@ impl Mul for SmartNum {
     }
 }
 
-fn gen_range() -> Vec<(i64, i64)> {
-    let mut rg = Vec::<(i64, i64)>::new();
+fn gen_range() -> Vec<i64> {
+    let mut rg = Vec::<i64>::new();
     for i in -1000_i64..1000_i64 {
-        for j in -1000_i64..1000_i64 {
+        rg.push(i);
+    }
+    return rg;
+}
+
+fn gen_double_range() -> Vec<(i64, i64)> {
+    let mut rg = Vec::<(i64, i64)>::new();
+    for i in gen_range() {
+        for j in gen_range() {
             rg.push((i, j));
         }
     }
@@ -86,7 +101,7 @@ fn gen_range() -> Vec<(i64, i64)> {
 
 #[test]
 fn add_ii() {
-    for (i, j) in gen_range() {
+    for (i, j) in gen_double_range() {
         let x = i as i64;
         let y = j as i64;
         let ans = SmartNum::from(x) + SmartNum::from(y);
@@ -97,7 +112,7 @@ fn add_ii() {
 
 #[test]
 fn add_ff() {
-    for (i, j) in gen_range() {
+    for (i, j) in gen_double_range() {
         let x = i as f64;
         let y = j as f64;
         let ans = SmartNum::from(x) + SmartNum::from(y);
@@ -108,7 +123,7 @@ fn add_ff() {
 
 #[test]
 fn add_if() {
-    for (i, j) in gen_range() {
+    for (i, j) in gen_double_range() {
         let x = i as i64;
         let y = j as f64;
         let ans = SmartNum::from(x) + SmartNum::from(y);
@@ -119,7 +134,7 @@ fn add_if() {
 
 #[test]
 fn mul_ii() {
-    for (i, j) in gen_range() {
+    for (i, j) in gen_double_range() {
         let x = i as i64;
         let y = j as i64;
         let ans = SmartNum::from(x) * SmartNum::from(y);
@@ -130,7 +145,7 @@ fn mul_ii() {
 
 #[test]
 fn mul_ff() {
-    for (i, j) in gen_range() {
+    for (i, j) in gen_double_range() {
         let x = i as f64;
         let y = j as f64;
         let ans = SmartNum::from(x) * SmartNum::from(y);
@@ -141,11 +156,23 @@ fn mul_ff() {
 
 #[test]
 fn mul_if() {
-    for (i, j) in gen_range() {
+    for (i, j) in gen_double_range() {
         let x = i as i64;
         let y = j as f64;
         let ans = SmartNum::from(x) * SmartNum::from(y);
         let check = SmartNum::from(x as f64 * y);
         assert!(is_close(ans.to_f64(), check.to_f64()));
+    }
+}
+
+#[test]
+fn string_fmt() {
+    for i in gen_range() {
+        let x = i.clone() as i64;
+        let y = i.clone() as f64;
+        let a = SmartNum::from(x);
+        let b = SmartNum::from(y);
+        assert_eq!(a.to_string(), format!("{}", x));
+        assert_eq!(b.to_string(), format!("{:.3}", y));
     }
 }
