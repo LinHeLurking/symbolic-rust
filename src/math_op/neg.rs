@@ -25,13 +25,13 @@ impl<'a> Neg for Expression<'a> {
 #[cfg(test)]
 mod test {
     use super::Expression;
-    use crate::compute::simplify::Simplify;
+    use crate::compute::evaluate::NumericEvaluate;
 
     #[test]
     fn neg() {
         let x = Expression::from(1_i32);
         let y = Expression::from(-1_i32);
-        let z = (-y).simplify();
+        let z = (-y).eval();
         assert_eq!(
             x.to_smart_num().unwrap().to_i64(),
             z.to_smart_num().unwrap().to_i64()

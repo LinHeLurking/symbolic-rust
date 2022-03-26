@@ -24,7 +24,7 @@ impl<'a> Add for Expression<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{ast::ast_node::Expression, compute::simplify::Simplify};
+    use crate::{ast::ast_node::Expression, compute::evaluate::NumericEvaluate};
 
     #[test]
     fn add() {
@@ -37,7 +37,7 @@ mod tests {
         {
             let x = Expression::from(1_u32);
             let y = Expression::from(1_u32);
-            let z = (x + y).simplify();
+            let z = (x + y).eval();
             let expected = Expression::from(2_u32);
             assert!(z.near(&expected, 1e-9).unwrap());
         }

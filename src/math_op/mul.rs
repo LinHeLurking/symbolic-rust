@@ -24,7 +24,7 @@ impl<'a> Mul for Expression<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{ast::ast_node::Expression, compute::simplify::Simplify};
+    use crate::{ast::ast_node::Expression, compute::evaluate::NumericEvaluate};
 
     #[test]
     fn mul() {
@@ -37,7 +37,7 @@ mod tests {
         {
             let x = Expression::from(2_i32);
             let y = Expression::from(2_i32);
-            let z = (x * y).simplify();
+            let z = (x * y).eval();
             let expected = Expression::from(4_i32);
             assert!(z.near(&expected, 1e-9).unwrap());
         }
