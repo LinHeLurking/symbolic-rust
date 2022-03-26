@@ -12,8 +12,11 @@ pub enum AstNode {
     Operand(AstOperand),
 }
 
-impl From<SmartNum> for AstNode {
-    fn from(v: SmartNum) -> Self {
+impl<T> From<T> for AstNode
+where
+    T: Into<SmartNum>,
+{
+    fn from(v: T) -> Self {
         AstNode::Operand(AstOperand::from(v))
     }
 }
@@ -158,101 +161,13 @@ impl Div for Expression {
     }
 }
 
-impl From<SmartNum> for Expression {
-    fn from(v: SmartNum) -> Self {
+impl<T> From<T> for Expression
+where
+    T: Into<SmartNum>,
+{
+    fn from(v: T) -> Self {
         Expression {
-            me: AstNode::Operand(AstOperand::from(v)),
-            child: vec![],
-        }
-    }
-}
-
-// Automatically generated from python script.
-impl From<f32> for Expression {
-    fn from(v: f32) -> Self {
-        Expression {
-            me: AstNode::Operand(AstOperand::from(v)),
-            child: vec![],
-        }
-    }
-}
-
-impl From<f64> for Expression {
-    fn from(v: f64) -> Self {
-        Expression {
-            me: AstNode::Operand(AstOperand::from(v)),
-            child: vec![],
-        }
-    }
-}
-
-impl From<u8> for Expression {
-    fn from(v: u8) -> Self {
-        Expression {
-            me: AstNode::Operand(AstOperand::from(v)),
-            child: vec![],
-        }
-    }
-}
-
-impl From<i8> for Expression {
-    fn from(v: i8) -> Self {
-        Expression {
-            me: AstNode::Operand(AstOperand::from(v)),
-            child: vec![],
-        }
-    }
-}
-
-impl From<u16> for Expression {
-    fn from(v: u16) -> Self {
-        Expression {
-            me: AstNode::Operand(AstOperand::from(v)),
-            child: vec![],
-        }
-    }
-}
-
-impl From<i16> for Expression {
-    fn from(v: i16) -> Self {
-        Expression {
-            me: AstNode::Operand(AstOperand::from(v)),
-            child: vec![],
-        }
-    }
-}
-
-impl From<u32> for Expression {
-    fn from(v: u32) -> Self {
-        Expression {
-            me: AstNode::Operand(AstOperand::from(v)),
-            child: vec![],
-        }
-    }
-}
-
-impl From<i32> for Expression {
-    fn from(v: i32) -> Self {
-        Expression {
-            me: AstNode::Operand(AstOperand::from(v)),
-            child: vec![],
-        }
-    }
-}
-
-impl From<u64> for Expression {
-    fn from(v: u64) -> Self {
-        Expression {
-            me: AstNode::Operand(AstOperand::from(v)),
-            child: vec![],
-        }
-    }
-}
-
-impl From<i64> for Expression {
-    fn from(v: i64) -> Self {
-        Expression {
-            me: AstNode::Operand(AstOperand::from(v)),
+            me: AstNode::from(v),
             child: vec![],
         }
     }
