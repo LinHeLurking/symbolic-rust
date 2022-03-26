@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+mod rational;
+
 use std::{
     fmt::Display,
     ops::{Add, Div, Mul, Neg, Sub},

@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
-use super::{op::*, smart_num::SmartNum};
+use super::op::*;
+use crate::smart_num::SmartNum;
 use std::{error::Error, fmt::Display};
 
 #[derive(Debug, Clone)]
