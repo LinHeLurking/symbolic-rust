@@ -5,18 +5,20 @@ use crate::ast::{
     op::AstOperator,
 };
 
-pub(crate) const OP_MUL: AstOperator = AstOperator {
-    symbol: "*",
-    priority: 3_u32,
-    descriptor: "Mul",
-};
+fn gen_op_mul() -> AstOperator {
+    AstOperator {
+        symbol: "*".to_string(),
+        priority: 3_u32,
+        descriptor: "Mul".to_string(),
+    }
+}
 
-impl<'a> Mul for Expression<'a> {
-    type Output = Expression<'a>;
+impl Mul for Expression {
+    type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
         Expression {
-            root: AstNode::Operator(OP_MUL.clone()),
+            root: AstNode::Operator(gen_op_mul()),
             child: vec![self, rhs],
         }
     }

@@ -1,7 +1,4 @@
-use crate::{
-    ast::ast_node::{AstNode, Expression},
-    math_op::{add::OP_ADD, div::OP_DIV, mul::OP_MUL, neg::OP_NEG, sub::OP_SUB},
-};
+use crate::ast::ast_node::{AstNode, Expression};
 
 pub trait NumericEvaluate {
     /// Evaluate and aggregate numbers in expression.
@@ -13,19 +10,19 @@ pub trait NumericEvaluate {
     fn full_eval(&self) -> Self;
 }
 
-impl<'a> NumericEvaluate for Expression<'a> {
+impl NumericEvaluate for Expression {
     fn eval(&self) -> Self {
         match &self.root {
             AstNode::Operand(_) => self.clone(),
             AstNode::Operator(operator) => {
-                if operator.descriptor == OP_NEG.descriptor {
+                if operator.descriptor == "Neg" {
                     let sub = self.child[0].eval();
                     if sub.is_num() {
                         Expression::from(-sub.to_smart_num().unwrap())
                     } else {
                         -sub
                     }
-                } else if operator.descriptor == OP_ADD.descriptor {
+                } else if operator.descriptor == "Add" {
                     let l = self.child[0].eval();
                     let r = self.child[1].eval();
                     if l.is_num() && r.is_num() {
@@ -33,7 +30,7 @@ impl<'a> NumericEvaluate for Expression<'a> {
                     } else {
                         l + r
                     }
-                } else if operator.descriptor == OP_SUB.descriptor {
+                } else if operator.descriptor == "Sub" {
                     let l = self.child[0].eval();
                     let r = self.child[1].eval();
                     if l.is_num() && r.is_num() {
@@ -41,7 +38,7 @@ impl<'a> NumericEvaluate for Expression<'a> {
                     } else {
                         l - r
                     }
-                } else if operator.descriptor == OP_MUL.descriptor {
+                } else if operator.descriptor == "Mul" {
                     let l = self.child[0].eval();
                     let r = self.child[1].eval();
                     if l.is_num() && r.is_num() {
@@ -49,7 +46,7 @@ impl<'a> NumericEvaluate for Expression<'a> {
                     } else {
                         l * r
                     }
-                } else if operator.descriptor == OP_DIV.descriptor {
+                } else if operator.descriptor == "Div" {
                     let l = self.child[0].eval();
                     let r = self.child[1].eval();
                     if l.is_num() && r.is_num() {

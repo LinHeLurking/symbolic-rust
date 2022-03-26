@@ -5,18 +5,20 @@ use crate::ast::{
     op::AstOperator,
 };
 
-pub(crate) const OP_SUB: AstOperator = AstOperator {
-    symbol: "-",
-    priority: 2_u32,
-    descriptor: "Sub",
-};
+fn gen_op_sub() -> AstOperator {
+    AstOperator {
+        symbol: "-".to_string(),
+        priority: 2_u32,
+        descriptor: "Sub".to_string(),
+    }
+}
 
-impl<'a> Sub for Expression<'a> {
-    type Output = Expression<'a>;
+impl Sub for Expression {
+    type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
         Expression {
-            root: AstNode::Operator(OP_SUB.clone()),
+            root: AstNode::Operator(gen_op_sub()),
             child: vec![self, rhs],
         }
     }

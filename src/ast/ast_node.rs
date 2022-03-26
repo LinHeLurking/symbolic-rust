@@ -4,12 +4,12 @@ use super::{op::*, smart_num::SmartNum};
 use std::{error::Error, fmt::Display};
 
 #[derive(Debug, Clone)]
-pub enum AstNode<'a> {
-    Operator(AstOperator<'a>),
-    Operand(AstOperand<'a>),
+pub enum AstNode {
+    Operator(AstOperator),
+    Operand(AstOperand),
 }
 
-impl<'a, T> From<T> for AstNode<'a>
+impl<T> From<T> for AstNode
 where
     T: Into<SmartNum>,
 {
@@ -19,30 +19,29 @@ where
 }
 
 #[derive(Debug, Clone)]
-pub struct Expression<'a> {
-    pub root: AstNode<'a>,
-    pub child: Vec<Expression<'a>>,
+pub struct Expression {
+    pub root: AstNode,
+    pub child: Vec<Expression>,
 }
 
 #[derive(Debug)]
-pub struct ExprIsNotNumError<'a> {
-    pub expr: &'a Expression<'a>,
+pub struct ExprIsNotNumError {
     pub source_: Option<&'static dyn Error>,
 }
 
-impl<'a> Display for ExprIsNotNumError<'a> {
+impl Display for ExprIsNotNumError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} is not a number!", self.expr)
+        write!(f, "This expression is not a number!")
     }
 }
 
-impl<'a> Error for ExprIsNotNumError<'a> {
+impl Error for ExprIsNotNumError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         self.source_
     }
 }
 
-impl<'a> Expression<'a> {
+impl Expression {
     pub fn is_operator(&self) -> bool {
         match &self.root {
             AstNode::Operator(_) => true,
@@ -66,21 +65,17 @@ impl<'a> Expression<'a> {
 
     pub fn to_smart_num(&self) -> Result<SmartNum, ExprIsNotNumError> {
         match &self.root {
-            AstNode::Operator(_) => Err(ExprIsNotNumError {
-                expr: self,
-                source_: None,
-            }),
-            AstNode::Operand(operand) => operand.to_smart_num().map_err(|e| ExprIsNotNumError {
-                expr: self,
-                source_: Some(e),
-            }),
+            AstNode::Operator(_) => Err(ExprIsNotNumError { source_: None }),
+            AstNode::Operand(operand) => operand
+                .to_smart_num()
+                .map_err(|e| ExprIsNotNumError { source_: Some(e) }),
         }
     }
 
-    pub fn near(&'a self, another: &'a Expression, eps: f64) -> Result<bool, ExprIsNotNumError> {
+    pub fn near(&self, another: &Expression, eps: f64) -> Result<bool, ExprIsNotNumError> {
         let x = self.to_smart_num()?;
         let y = another.to_smart_num()?;
-        return Ok((x-y).to_f64().abs() < eps);
+        return Ok((x - y).to_f64().abs() < eps);
     }
 
     fn to_string_raw(&self, upper_priority: u32) -> String {
@@ -110,13 +105,13 @@ impl<'a> Expression<'a> {
     }
 }
 
-impl<'a> Display for Expression<'a> {
+impl Display for Expression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.to_string_raw(0_u32))
     }
 }
 
-impl<'a, T> From<T> for Expression<'a>
+impl<T> From<T> for Expression
 where
     T: Into<SmartNum>,
 {

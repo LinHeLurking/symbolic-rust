@@ -5,18 +5,20 @@ use crate::ast::{
     op::AstOperator,
 };
 
-pub(crate) const OP_DIV: AstOperator = AstOperator {
-    symbol: "/",
-    priority: 3_u32,
-    descriptor: "Div",
-};
+fn gen_op_div() -> AstOperator {
+    AstOperator {
+        symbol: "/".to_string(),
+        priority: 3_u32,
+        descriptor: "Div".to_string(),
+    }
+}
 
-impl<'a> Div for Expression<'a> {
-    type Output = Expression<'a>;
+impl Div for Expression {
+    type Output = Self;
 
     fn div(self, rhs: Self) -> Self::Output {
         Expression {
-            root: AstNode::Operator(OP_DIV.clone()),
+            root: AstNode::Operator(gen_op_div()),
             child: vec![self, rhs],
         }
     }

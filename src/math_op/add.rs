@@ -5,18 +5,20 @@ use crate::ast::{
     op::AstOperator,
 };
 
-pub(crate) const OP_ADD: AstOperator = AstOperator {
-    symbol: "+",
-    priority: 2_u32,
-    descriptor: "Add",
-};
+fn gen_op_add() -> AstOperator {
+    AstOperator {
+        symbol: "+".to_string(),
+        priority: 2_u32,
+        descriptor: "Add".to_string(),
+    }
+}
 
-impl<'a> Add for Expression<'a> {
-    type Output = Expression<'a>;
+impl Add for Expression {
+    type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
         Expression {
-            root: AstNode::Operator(OP_ADD.clone()),
+            root: AstNode::Operator(gen_op_add()),
             child: vec![self, rhs],
         }
     }

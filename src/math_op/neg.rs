@@ -5,18 +5,20 @@ use crate::ast::{
     op::AstOperator,
 };
 
-pub(crate) const OP_NEG: AstOperator = AstOperator {
-    symbol: "-",
-    priority: 1_u32,
-    descriptor: "Neg",
-};
+fn gen_op_nge() -> AstOperator {
+    AstOperator {
+        symbol: "-".to_string(),
+        priority: 1_u32,
+        descriptor: "Neg".to_string(),
+    }
+}
 
-impl<'a> Neg for Expression<'a> {
+impl Neg for Expression {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
         Expression {
-            root: AstNode::Operator(OP_NEG.clone()),
+            root: AstNode::Operator(gen_op_nge()),
             child: vec![self],
         }
     }

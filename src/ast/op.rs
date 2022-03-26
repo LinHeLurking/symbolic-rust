@@ -4,41 +4,43 @@ use super::smart_num::SmartNum;
 use std::{error::Error, fmt::Display};
 
 #[derive(Debug, Clone)]
-pub struct AstOperator<'a> {
-    pub symbol: &'a str,
+pub struct AstOperator {
+    pub symbol: String,
     pub priority: u32,
-    pub(crate) descriptor: &'a str,
+    pub(crate) descriptor: String,
 }
 
-impl<'a> PartialEq for AstOperator<'a> {
+impl PartialEq for AstOperator {
     fn eq(&self, other: &Self) -> bool {
         self.descriptor == other.descriptor
     }
 }
 
-impl<'a> Eq for AstOperator<'a> {}
+impl Eq for AstOperator {}
 
-impl<'a> Display for AstOperator<'a> {
+impl Display for AstOperator {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.symbol)
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct Variable<'a> {
-    pub name: &'a str,
+pub struct Variable {
+    pub name: String,
 }
 
-impl<'a> Variable<'a> {
-    pub fn new_variable(name: &'a str) -> Variable {
-        Variable { name }
+impl Variable {
+    pub fn new_variable(name: &str) -> Variable {
+        Variable {
+            name: String::from(name),
+        }
     }
 }
 
 #[derive(Debug, Clone)]
-pub enum AstOperand<'a> {
+pub enum AstOperand {
     Num(SmartNum),
-    Variable(Variable<'a>),
+    Variable(Variable),
 }
 
 #[derive(Debug)]
@@ -58,7 +60,7 @@ impl Error for OperandIsNotNumberError {
 
 pub static OPERAND_IS_NOT_NUMBER_ERROR: OperandIsNotNumberError = OperandIsNotNumberError {};
 
-impl<'a> AstOperand<'a> {
+impl AstOperand {
     pub fn to_string(&self) -> String {
         match self {
             AstOperand::Num(num) => num.to_string(),
@@ -66,8 +68,10 @@ impl<'a> AstOperand<'a> {
         }
     }
 
-    pub fn new_variable(name: &'a str) -> AstOperand {
-        AstOperand::Variable(Variable { name })
+    pub fn new_variable(name: &str) -> AstOperand {
+        AstOperand::Variable(Variable {
+            name: String::from(name),
+        })
     }
 
     pub fn is_num(&self) -> bool {
@@ -85,13 +89,13 @@ impl<'a> AstOperand<'a> {
     }
 }
 
-impl<'a> Display for AstOperand<'a> {
+impl Display for AstOperand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.to_string())
     }
 }
 
-impl<'a, T> From<T> for AstOperand<'a>
+impl<T> From<T> for AstOperand
 where
     T: Into<SmartNum>,
 {
