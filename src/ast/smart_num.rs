@@ -1,6 +1,9 @@
 #![allow(dead_code)]
 
-use std::ops::{Add, Div, Mul, Sub};
+use std::{
+    fmt::Display,
+    ops::{Add, Div, Mul, Sub},
+};
 
 #[derive(Debug, Clone, Copy)]
 pub enum SmartNum {
@@ -8,14 +11,17 @@ pub enum SmartNum {
     Real(f64),
 }
 
-impl SmartNum {
-    pub fn to_string(&self) -> String {
-        match self {
+impl Display for SmartNum {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let content = match self {
             SmartNum::Integer(k) => format!("{}", k),
             SmartNum::Real(f) => format!("{:.3}", f),
-        }
+        };
+        write!(f, "{}", content)
     }
+}
 
+impl SmartNum {
     pub fn to_i64(&self) -> i64 {
         match self {
             SmartNum::Integer(v) => *v,

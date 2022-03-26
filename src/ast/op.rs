@@ -18,15 +18,9 @@ impl<'a> PartialEq for AstOperator<'a> {
 
 impl<'a> Eq for AstOperator<'a> {}
 
-impl<'a> AstOperator<'a> {
-    pub fn to_string(&self) -> String {
-        self.symbol.to_string()
-    }
-}
-
 impl<'a> Display for AstOperator<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.to_string())
+        write!(f, "{}", self.symbol)
     }
 }
 

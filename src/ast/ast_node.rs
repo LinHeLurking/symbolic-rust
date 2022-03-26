@@ -72,10 +72,6 @@ impl<'a> Expression<'a> {
         }
     }
 
-    pub fn to_string(&self) -> String {
-        return self.to_string_raw(0_u32);
-    }
-
     pub fn new_variable(name: &str) -> Expression {
         Expression {
             me: AstNode::Operand(AstOperand::new_variable(name)),
@@ -86,6 +82,6 @@ impl<'a> Expression<'a> {
 
 impl<'a> Display for Expression<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.to_string())
+        write!(f, "{}", self.to_string_raw(0_u32))
     }
 }
