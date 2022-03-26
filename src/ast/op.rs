@@ -3,109 +3,60 @@
 use super::smart_num::SmartNum;
 use std::{fmt::Display, panic};
 
-#[derive(Debug, Clone, Copy)]
-pub struct AstOperatorBase {
-    name: &'static str,
-    priority: u32,
+#[derive(Debug, Clone)]
+pub struct AstOperator<'a> {
+    pub symbol: &'a str,
+    pub priority: u32,
+    pub(crate) descriptor: &'a str,
 }
 
-#[derive(Debug, Clone, Copy)]
-pub enum AstOperator {
-    Neg(AstOperatorBase),
-    Add(AstOperatorBase),
-    Sub(AstOperatorBase),
-    Mul(AstOperatorBase),
-    Div(AstOperatorBase),
-}
-
-impl AstOperator {
-    fn to_base(&self) -> &AstOperatorBase {
-        match self {
-            Self::Neg(op) | Self::Add(op) | Self::Sub(op) | Self::Mul(op) | Self::Div(op) => op,
-        }
-    }
-
-    pub fn to_string(&self) -> &str {
-        self.to_base().name
-    }
-
-    pub fn priority(&self) -> u32 {
-        self.to_base().priority.clone()
-    }
-
-    pub fn gen_neg_op() -> AstOperator {
-        AstOperator::Neg(AstOperatorBase {
-            name: "-",
-            priority: 1,
-        })
-    }
-
-    pub fn gen_add_op() -> AstOperator {
-        AstOperator::Add(AstOperatorBase {
-            name: "+",
-            priority: 2,
-        })
-    }
-
-    pub fn gen_sub_op() -> AstOperator {
-        AstOperator::Sub(AstOperatorBase {
-            name: "-",
-            priority: 2,
-        })
-    }
-
-    pub fn gen_mul_op() -> AstOperator {
-        AstOperator::Mul(AstOperatorBase {
-            name: "*",
-            priority: 3,
-        })
-    }
-
-    pub fn gen_div_op() -> AstOperator {
-        AstOperator::Div(AstOperatorBase {
-            name: "/",
-            priority: 3,
-        })
+impl<'a> PartialEq for AstOperator<'a> {
+    fn eq(&self, other: &Self) -> bool {
+        self.descriptor == other.descriptor
     }
 }
 
-impl Display for AstOperator {
+impl<'a> Eq for AstOperator<'a> {}
+
+impl<'a> AstOperator<'a> {
+    pub fn to_string(&self) -> String {
+        self.symbol.to_string()
+    }
+}
+
+impl<'a> Display for AstOperator<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.to_string())
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct Variable {
-    pub(crate) name: String,
+pub struct Variable<'a> {
+    pub name: &'a str,
 }
 
-impl Variable {
-    pub fn new_variable(name: &str) -> Variable {
-        Variable {
-            name: name.to_string(),
-        }
+impl<'a> Variable<'a> {
+    pub fn new_variable(name: &'a str) -> Variable {
+        Variable { name }
     }
 }
 
 #[derive(Debug, Clone)]
-pub enum AstOperand {
+pub enum AstOperand<'a> {
     Num(SmartNum),
-    Variable(Variable),
+    Variable(Variable<'a>),
 }
 
-impl AstOperand {
+impl<'a> AstOperand<'a> {
     pub fn to_string(&self) -> String {
         match self {
             AstOperand::Num(num) => num.to_string(),
-            AstOperand::Variable(var) => var.name.clone(),
+            AstOperand::Variable(var) => var.name.to_string(),
         }
     }
 
-    pub fn new_variable(name: &str) -> AstOperand {
-        AstOperand::Variable(Variable {
-            name: name.to_string(),
-        })
+    pub fn new_variable(name: &'a str) -> AstOperand {
+        AstOperand::Variable(Variable { name })
     }
 
     pub fn is_num(&self) -> bool {
@@ -123,33 +74,18 @@ impl AstOperand {
     }
 }
 
-impl Display for AstOperand {
+impl<'a> Display for AstOperand<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.to_string())
     }
 }
 
-impl<T> From<T> for AstOperand
+impl<'a, T> From<T> for AstOperand<'a>
 where
     T: Into<SmartNum>,
 {
     fn from(v: T) -> Self {
         AstOperand::Num(v.into())
-    }
-}
-
-#[test]
-fn operator_to_fmt() {
-    let check_table = vec![
-        (AstOperator::gen_neg_op(), "-"),
-        (AstOperator::gen_add_op(), "+"),
-        (AstOperator::gen_sub_op(), "-"),
-        (AstOperator::gen_mul_op(), "*"),
-        (AstOperator::gen_div_op(), "/"),
-    ];
-    for (op, expected) in check_table {
-        assert_eq!(op.to_string(), expected);
-        assert_eq!(format!("{}", op), expected);
     }
 }
 
