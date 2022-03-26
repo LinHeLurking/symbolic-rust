@@ -21,10 +21,7 @@ impl<'a> NumAggregateSimplify for Expression<'a> {
                     if sub.is_num() {
                         Expression::from(-sub.to_smart_num().unwrap())
                     } else {
-                        Expression {
-                            root: AstNode::gen_neg_op_node(),
-                            child: vec![sub],
-                        }
+                        -sub
                     }
                 } else {
                     panic!("Aggregation not Implemented for {}", operator.symbol);
