@@ -2,7 +2,7 @@
 
 use std::{
     fmt::Display,
-    ops::{Add, Div, Mul, Sub},
+    ops::{Add, Div, Mul, Neg, Sub},
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -178,102 +178,136 @@ impl Div for SmartNum {
     }
 }
 
-fn gen_range() -> Vec<i64> {
-    let mut rg = Vec::<i64>::new();
-    for i in -1000_i64..1000_i64 {
-        rg.push(i);
-    }
-    return rg;
-}
+impl Neg for SmartNum {
+    type Output = SmartNum;
 
-fn gen_double_range() -> Vec<(i64, i64)> {
-    let mut rg = Vec::<(i64, i64)>::new();
-    for i in gen_range() {
-        for j in gen_range() {
-            rg.push((i, j));
+    fn neg(self) -> Self::Output {
+        match self {
+            SmartNum::Integer(v) => SmartNum::Integer(-v),
+            SmartNum::Real(v) => SmartNum::Real(-v),
         }
     }
-    return rg;
 }
 
-fn is_close(a: f64, b: f64) -> bool {
-    return (a - b).abs() < 1e-9;
-}
+#[cfg(test)]
+mod tests {
+    use super::SmartNum;
 
-#[test]
-fn add_ii() {
-    for (i, j) in gen_double_range() {
-        let x = i as i64;
-        let y = j as i64;
-        let ans = SmartNum::from(x) + SmartNum::from(y);
-        let check = SmartNum::from(x + y);
-        assert_eq!(ans.to_i64(), check.to_i64());
+    fn gen_range() -> Vec<i64> {
+        let mut rg = Vec::<i64>::new();
+        for i in -1000_i64..1000_i64 {
+            rg.push(i);
+        }
+        return rg;
     }
-}
 
-#[test]
-fn add_ff() {
-    for (i, j) in gen_double_range() {
-        let x = i as f64;
-        let y = j as f64;
-        let ans = SmartNum::from(x) + SmartNum::from(y);
-        let check = SmartNum::from(x + y);
-        assert!(is_close(ans.to_f64(), check.to_f64()));
+    fn gen_double_range() -> Vec<(i64, i64)> {
+        let mut rg = Vec::<(i64, i64)>::new();
+        for i in gen_range() {
+            for j in gen_range() {
+                rg.push((i, j));
+            }
+        }
+        return rg;
     }
-}
 
-#[test]
-fn add_if() {
-    for (i, j) in gen_double_range() {
-        let x = i as i64;
-        let y = j as f64;
-        let ans = SmartNum::from(x) + SmartNum::from(y);
-        let check = SmartNum::from(x as f64 + y);
-        assert!(is_close(ans.to_f64(), check.to_f64()));
+    fn is_close(a: f64, b: f64) -> bool {
+        return (a - b).abs() < 1e-9;
     }
-}
 
-#[test]
-fn mul_ii() {
-    for (i, j) in gen_double_range() {
-        let x = i as i64;
-        let y = j as i64;
-        let ans = SmartNum::from(x) * SmartNum::from(y);
-        let check = SmartNum::from(x * y);
-        assert_eq!(ans.to_i64(), check.to_i64());
+    #[test]
+    fn neg_i() {
+        for i in gen_range() {
+            let x = SmartNum::from(i);
+            let y = SmartNum::from(-i);
+            assert_eq!(x.to_i64(), (-y).to_i64())
+        }
     }
-}
 
-#[test]
-fn mul_ff() {
-    for (i, j) in gen_double_range() {
-        let x = i as f64;
-        let y = j as f64;
-        let ans = SmartNum::from(x) * SmartNum::from(y);
-        let check = SmartNum::from(x * y);
-        assert!(is_close(ans.to_f64(), check.to_f64()));
+    #[test]
+    fn neg_f() {
+        for i in gen_range() {
+            let x = SmartNum::from(i as f64);
+            let y = SmartNum::from(-i as f64);
+            assert!(is_close(x.to_f64(), (-y).to_f64()));
+        }
     }
-}
 
-#[test]
-fn mul_if() {
-    for (i, j) in gen_double_range() {
-        let x = i as i64;
-        let y = j as f64;
-        let ans = SmartNum::from(x) * SmartNum::from(y);
-        let check = SmartNum::from(x as f64 * y);
-        assert!(is_close(ans.to_f64(), check.to_f64()));
+    #[test]
+    fn add_ii() {
+        for (i, j) in gen_double_range() {
+            let x = i as i64;
+            let y = j as i64;
+            let ans = SmartNum::from(x) + SmartNum::from(y);
+            let check = SmartNum::from(x + y);
+            assert_eq!(ans.to_i64(), check.to_i64());
+        }
     }
-}
 
-#[test]
-fn string_fmt() {
-    for i in gen_range() {
-        let x = i.clone() as i64;
-        let y = i.clone() as f64;
-        let a = SmartNum::from(x);
-        let b = SmartNum::from(y);
-        assert_eq!(a.to_string(), format!("{}", x));
-        assert_eq!(b.to_string(), format!("{:.3}", y));
+    #[test]
+    fn add_ff() {
+        for (i, j) in gen_double_range() {
+            let x = i as f64;
+            let y = j as f64;
+            let ans = SmartNum::from(x) + SmartNum::from(y);
+            let check = SmartNum::from(x + y);
+            assert!(is_close(ans.to_f64(), check.to_f64()));
+        }
+    }
+
+    #[test]
+    fn add_if() {
+        for (i, j) in gen_double_range() {
+            let x = i as i64;
+            let y = j as f64;
+            let ans = SmartNum::from(x) + SmartNum::from(y);
+            let check = SmartNum::from(x as f64 + y);
+            assert!(is_close(ans.to_f64(), check.to_f64()));
+        }
+    }
+
+    #[test]
+    fn mul_ii() {
+        for (i, j) in gen_double_range() {
+            let x = i as i64;
+            let y = j as i64;
+            let ans = SmartNum::from(x) * SmartNum::from(y);
+            let check = SmartNum::from(x * y);
+            assert_eq!(ans.to_i64(), check.to_i64());
+        }
+    }
+
+    #[test]
+    fn mul_ff() {
+        for (i, j) in gen_double_range() {
+            let x = i as f64;
+            let y = j as f64;
+            let ans = SmartNum::from(x) * SmartNum::from(y);
+            let check = SmartNum::from(x * y);
+            assert!(is_close(ans.to_f64(), check.to_f64()));
+        }
+    }
+
+    #[test]
+    fn mul_if() {
+        for (i, j) in gen_double_range() {
+            let x = i as i64;
+            let y = j as f64;
+            let ans = SmartNum::from(x) * SmartNum::from(y);
+            let check = SmartNum::from(x as f64 * y);
+            assert!(is_close(ans.to_f64(), check.to_f64()));
+        }
+    }
+
+    #[test]
+    fn string_fmt() {
+        for i in gen_range() {
+            let x = i.clone() as i64;
+            let y = i.clone() as f64;
+            let a = SmartNum::from(x);
+            let b = SmartNum::from(y);
+            assert_eq!(a.to_string(), format!("{}", x));
+            assert_eq!(b.to_string(), format!("{:.3}", y));
+        }
     }
 }

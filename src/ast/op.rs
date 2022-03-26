@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use super::smart_num::SmartNum;
-use std::{fmt::Display, panic};
+use std::{error::Error, fmt::Display};
 
 #[derive(Debug, Clone)]
 pub struct AstOperator<'a> {
@@ -41,6 +41,23 @@ pub enum AstOperand<'a> {
     Variable(Variable<'a>),
 }
 
+#[derive(Debug)]
+pub struct OperandIsNotNumberError {}
+
+impl Display for OperandIsNotNumberError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "operand is not a number!")
+    }
+}
+
+impl Error for OperandIsNotNumberError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        None
+    }
+}
+
+pub static OPERAND_IS_NOT_NUMBER_ERROR: OperandIsNotNumberError = OperandIsNotNumberError {};
+
 impl<'a> AstOperand<'a> {
     pub fn to_string(&self) -> String {
         match self {
@@ -60,10 +77,10 @@ impl<'a> AstOperand<'a> {
         }
     }
 
-    pub fn to_smart_num(&self) -> SmartNum {
+    pub fn to_smart_num(&self) -> Result<SmartNum, &'static OperandIsNotNumberError> {
         match &self {
-            AstOperand::Num(num) => num.clone(),
-            _ => panic!("This is not a number!"),
+            AstOperand::Num(num) => Ok(num.clone()),
+            _ => Err(&OPERAND_IS_NOT_NUMBER_ERROR),
         }
     }
 }
@@ -99,5 +116,15 @@ fn operand_to_fmt() {
         let x = AstOperand::new_variable("x");
         assert_eq!(x.to_string(), "x");
         assert_eq!(format!("{}", x), "x");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::AstOperand;
+    #[test]
+    fn operand_cast() {
+        let x = AstOperand::from(0_u32);
+        assert!(x.to_smart_num().is_ok())
     }
 }

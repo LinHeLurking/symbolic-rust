@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use super::{op::*, smart_num::SmartNum};
-use std::fmt::Display;
+use std::{error::Error, fmt::Display};
 
 #[derive(Debug, Clone)]
 pub enum AstNode<'a> {
@@ -20,41 +20,65 @@ where
 
 #[derive(Debug, Clone)]
 pub struct Expression<'a> {
-    pub me: AstNode<'a>,
+    pub root: AstNode<'a>,
     pub child: Vec<Expression<'a>>,
+}
+
+#[derive(Debug)]
+pub struct ExprIsNotNumError<'a> {
+    pub expr: &'a Expression<'a>,
+    pub source_: Option<&'static dyn Error>,
+}
+
+impl<'a> Display for ExprIsNotNumError<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} is not a number!", self.expr)
+    }
+}
+
+impl<'a> Error for ExprIsNotNumError<'a> {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        self.source_
+    }
 }
 
 impl<'a> Expression<'a> {
     pub fn is_operator(&self) -> bool {
-        match &self.me {
+        match &self.root {
             AstNode::Operator(_) => true,
             AstNode::Operand(_) => false,
         }
     }
 
     pub fn is_operand(&self) -> bool {
-        match &self.me {
+        match &self.root {
             AstNode::Operator(_) => false,
             AstNode::Operand(_) => true,
         }
     }
 
     pub fn is_num(&self) -> bool {
-        match &self.me {
+        match &self.root {
             AstNode::Operator(_) => false,
             AstNode::Operand(operand) => operand.is_num(),
         }
     }
 
-    pub fn to_smart_num(&self) -> SmartNum {
-        match &self.me {
-            AstNode::Operator(_) => panic!("This is not a number node!"),
-            AstNode::Operand(operand) => operand.to_smart_num(),
+    pub fn to_smart_num(&self) -> Result<SmartNum, ExprIsNotNumError> {
+        match &self.root {
+            AstNode::Operator(_) => Err(ExprIsNotNumError {
+                expr: self,
+                source_: None,
+            }),
+            AstNode::Operand(operand) => operand.to_smart_num().map_err(|e| ExprIsNotNumError {
+                expr: self,
+                source_: Some(e),
+            }),
         }
     }
 
     fn to_string_raw(&self, upper_priority: u32) -> String {
-        match &self.me {
+        match &self.root {
             AstNode::Operand(v) => v.to_string(),
             AstNode::Operator(op) => {
                 let me = format!(
@@ -74,7 +98,7 @@ impl<'a> Expression<'a> {
 
     pub fn new_variable(name: &str) -> Expression {
         Expression {
-            me: AstNode::Operand(AstOperand::new_variable(name)),
+            root: AstNode::Operand(AstOperand::new_variable(name)),
             child: vec![],
         }
     }
@@ -83,5 +107,29 @@ impl<'a> Expression<'a> {
 impl<'a> Display for Expression<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.to_string_raw(0_u32))
+    }
+}
+
+impl<'a, T> From<T> for Expression<'a>
+where
+    T: Into<SmartNum>,
+{
+    fn from(v: T) -> Self {
+        Expression {
+            root: AstNode::from(v),
+            child: vec![],
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Expression;
+    #[test]
+    fn num_cast() {
+        let x = Expression::from(0_u32);
+        let y = Expression::new_variable("x");
+        assert!(x.to_smart_num().is_ok());
+        assert!(y.to_smart_num().is_err());
     }
 }
