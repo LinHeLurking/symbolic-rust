@@ -155,6 +155,26 @@ impl Div for RationalNum {
     }
 }
 
+impl From<u64> for RationalNum {
+    fn from(v: u64) -> Self {
+        RationalNum {
+            sign: 1,
+            nominator: v,
+            denominator: 1,
+        }
+    }
+}
+
+impl From<i64> for RationalNum {
+    fn from(v: i64) -> Self {
+        RationalNum {
+            sign: v.signum(),
+            nominator: v.abs() as u64,
+            denominator: 1,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::RationalNum;
