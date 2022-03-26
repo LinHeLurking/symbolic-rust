@@ -77,6 +77,12 @@ impl<'a> Expression<'a> {
         }
     }
 
+    pub fn near(&'a self, another: &'a Expression, eps: f64) -> Result<bool, ExprIsNotNumError> {
+        let x = self.to_smart_num()?;
+        let y = another.to_smart_num()?;
+        return Ok((x-y).to_f64().abs() < eps);
+    }
+
     fn to_string_raw(&self, upper_priority: u32) -> String {
         match &self.root {
             AstNode::Operand(v) => v.to_string(),

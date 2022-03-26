@@ -1,6 +1,6 @@
 use crate::{
     ast::ast_node::{AstNode, Expression},
-    math_op::neg::OP_NEG,
+    math_op::{add::OP_ADD, neg::OP_NEG},
 };
 
 trait NumAggregateSimplify {
@@ -22,6 +22,14 @@ impl<'a> NumAggregateSimplify for Expression<'a> {
                         Expression::from(-sub.to_smart_num().unwrap())
                     } else {
                         -sub
+                    }
+                } else if operator.descriptor == OP_ADD.descriptor {
+                    let l = self.child[0].num_aggregate();
+                    let r = self.child[1].num_aggregate();
+                    if l.is_num() && r.is_num() {
+                        Expression::from(l.to_smart_num().unwrap() + r.to_smart_num().unwrap())
+                    } else {
+                        l + r
                     }
                 } else {
                     panic!("Aggregation not Implemented for {}", operator.symbol);

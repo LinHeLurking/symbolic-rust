@@ -22,12 +22,6 @@ impl<'a> Neg for Expression<'a> {
     }
 }
 
-impl<'a> AstNode<'a> {
-    pub fn gen_neg_op_node() -> AstNode<'a> {
-        AstNode::Operator(OP_NEG.clone())
-    }
-}
-
 #[cfg(test)]
 mod test {
     use super::Expression;
