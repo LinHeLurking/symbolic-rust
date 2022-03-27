@@ -64,7 +64,7 @@ impl Expression {
         }
     }
 
-    pub fn to_smart_num(&self) -> Result<SmartNum, ExprIsNotNumError> {
+    pub fn to_smart_num(&self) -> Result<&SmartNum, ExprIsNotNumError> {
         match &self.root {
             AstNode::Operator(_) => Err(ExprIsNotNumError { source_: None }),
             AstNode::Operand(operand) => operand
@@ -76,7 +76,7 @@ impl Expression {
     pub fn near(&self, another: &Expression, eps: f64) -> Result<bool, ExprIsNotNumError> {
         let x = self.to_smart_num()?;
         let y = another.to_smart_num()?;
-        return Ok((x - y).to_f64().abs() < eps);
+        return Ok((*x - *y).to_f64().abs() < eps);
     }
 
     fn to_string_raw(&self, upper_priority: u32) -> String {

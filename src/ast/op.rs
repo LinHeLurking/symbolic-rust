@@ -81,9 +81,9 @@ impl AstOperand {
         }
     }
 
-    pub fn to_smart_num(&self) -> Result<SmartNum, &'static OperandIsNotNumberError> {
+    pub fn to_smart_num(&self) -> Result<&SmartNum, &'static OperandIsNotNumberError> {
         match &self {
-            AstOperand::Num(num) => Ok(num.clone()),
+            AstOperand::Num(num) => Ok(&num),
             _ => Err(&OPERAND_IS_NOT_NUMBER_ERROR),
         }
     }
