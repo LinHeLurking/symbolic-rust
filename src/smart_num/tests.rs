@@ -280,7 +280,6 @@ mod smart_num_tests {
     }
 }
 
-
 #[cfg(test)]
 mod rational_tests {
     use super::super::rational::RationalNum;
@@ -428,5 +427,20 @@ mod rational_tests {
             let z = RationalNum::new_positive(2_u64, 1_u64).unwrap();
             assert_eq!(x / y, z);
         }
+    }
+}
+
+#[cfg(test)]
+mod special_const_tests {
+    use crate::smart_num::SmartNum;
+
+    #[test]
+    fn string_fmt() {
+        let pi = SmartNum::pi();
+        assert_eq!(pi.to_string(), "pi");
+        assert!(pi.near(&SmartNum::from(3.14), 1e-1));
+        let e = SmartNum::e();
+        assert_eq!(e.to_string(), "e");
+        assert!(e.near(&SmartNum::from(2.7), 1e-1));
     }
 }

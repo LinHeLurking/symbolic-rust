@@ -19,6 +19,11 @@ pub struct SmartNum {
     tag: Option<SpecialConst>,
 }
 
+pub trait ToSmartNum {
+    type Output;
+    fn to_smart_num(self) -> Self::Output;
+}
+
 impl SmartNum {
     pub fn to_i64(&self) -> Option<i64> {
         self.value.to_i64()

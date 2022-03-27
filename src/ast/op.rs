@@ -80,18 +80,31 @@ impl AstOperand {
             AstOperand::Variable(_) => false,
         }
     }
-
-    pub fn to_smart_num(&self) -> Result<&SmartNum, &'static OperandIsNotNumberError> {
-        match &self {
-            AstOperand::Num(num) => Ok(&num),
-            _ => Err(&OPERAND_IS_NOT_NUMBER_ERROR),
-        }
-    }
 }
 
 impl Display for AstOperand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.to_string())
+    }
+}
+
+impl ToSmartNum for AstOperand {
+    type Output = Result<SmartNum, &'static OperandIsNotNumberError>;
+    fn to_smart_num(self) -> Self::Output {
+        match self {
+            AstOperand::Num(num) => Ok(num),
+            _ => Err(&OPERAND_IS_NOT_NUMBER_ERROR),
+        }
+    }
+}
+
+impl<'a> ToSmartNum for &'a AstOperand {
+    type Output = Result<&'a SmartNum, &'static OperandIsNotNumberError>;
+    fn to_smart_num(self) -> Self::Output {
+        match self {
+            AstOperand::Num(num) => Ok(num),
+            _ => Err(&OPERAND_IS_NOT_NUMBER_ERROR),
+        }
     }
 }
 
@@ -125,6 +138,8 @@ fn operand_to_fmt() {
 
 #[cfg(test)]
 mod tests {
+    use crate::smart_num::ToSmartNum;
+
     use super::AstOperand;
     #[test]
     fn operand_cast() {

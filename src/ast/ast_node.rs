@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use super::op::*;
-use crate::smart_num::SmartNum;
+use crate::smart_num::{SmartNum, ToSmartNum};
 use std::{error::Error, fmt::Display};
 
 #[derive(Debug, Clone)]
@@ -64,15 +64,6 @@ impl Expression {
         }
     }
 
-    pub fn to_smart_num(&self) -> Result<&SmartNum, ExprIsNotNumError> {
-        match &self.root {
-            AstNode::Operator(_) => Err(ExprIsNotNumError { source_: None }),
-            AstNode::Operand(operand) => operand
-                .to_smart_num()
-                .map_err(|e| ExprIsNotNumError { source_: Some(e) }),
-        }
-    }
-
     pub fn near(&self, another: &Expression, eps: f64) -> Result<bool, ExprIsNotNumError> {
         let x = self.to_smart_num()?;
         let y = another.to_smart_num()?;
@@ -112,6 +103,30 @@ impl Display for Expression {
     }
 }
 
+impl ToSmartNum for Expression {
+    type Output = Result<SmartNum, ExprIsNotNumError>;
+    fn to_smart_num(self) -> Self::Output {
+        match self.root {
+            AstNode::Operator(_) => Err(ExprIsNotNumError { source_: None }),
+            AstNode::Operand(operand) => operand
+                .to_smart_num()
+                .map_err(|e| ExprIsNotNumError { source_: Some(e) }),
+        }
+    }
+}
+
+impl<'a> ToSmartNum for &'a Expression {
+    type Output = Result<&'a SmartNum, ExprIsNotNumError>;
+    fn to_smart_num(self) -> Self::Output {
+        match &self.root {
+            AstNode::Operator(_) => Err(ExprIsNotNumError { source_: None }),
+            AstNode::Operand(operand) => operand
+                .to_smart_num()
+                .map_err(|e| ExprIsNotNumError { source_: Some(e) }),
+        }
+    }
+}
+
 impl<T> From<T> for Expression
 where
     T: Into<SmartNum>,
@@ -126,6 +141,8 @@ where
 
 #[cfg(test)]
 mod tests {
+    use crate::smart_num::ToSmartNum;
+
     use super::Expression;
     #[test]
     fn num_cast() {
