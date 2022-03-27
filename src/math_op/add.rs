@@ -1,8 +1,11 @@
 use std::ops::Add;
 
-use crate::ast::{
-    ast_node::{AstNode, Expression},
-    op::AstOperator,
+use crate::{
+    ast::{
+        ast_node::{AstNode, Expression},
+        op::AstOperator,
+    },
+    compute::evaluate::NumericEvaluate, smart_num::ToSmartNum,
 };
 
 fn gen_op_add() -> AstOperator {
@@ -21,6 +24,16 @@ impl Add for Expression {
             root: AstNode::Operator(gen_op_add()),
             child: vec![self, rhs],
         }
+    }
+}
+
+pub(crate) fn add_eval_rule(mut child: Vec<Expression>) -> Expression {
+    let r = child.pop().unwrap().eval();
+    let l = child.pop().unwrap().eval();
+    if l.is_num() && r.is_num() {
+        Expression::from(l.to_smart_num().unwrap() + r.to_smart_num().unwrap())
+    } else {
+        l + r
     }
 }
 

@@ -1,4 +1,10 @@
-use crate::ast::ast_node::{AstNode, Expression};
+use crate::{
+    ast::ast_node::{AstNode, Expression},
+    math_op::{
+        add::add_eval_rule, div::div_eval_rule, mul::mul_eval_rule, neg::neg_eval_rule,
+        sub::sub_eval_rule,
+    },
+};
 
 pub trait NumericEvaluate {
     /// Evaluate and aggregate numbers in expression.
@@ -15,46 +21,18 @@ impl NumericEvaluate for Expression {
         match self.root {
             AstNode::Operand(_) => self.clone(),
             AstNode::Operator(operator) => {
-                let mut child = self.child;
+                let child = self.child;
+                // TODO: auto query
                 if operator.descriptor == "Neg" {
-                    let sub = child.pop().unwrap().eval();
-                    if sub.is_num() {
-                        Expression::from(-sub.to_smart_num().unwrap())
-                    } else {
-                        -sub
-                    }
+                    neg_eval_rule(child)
                 } else if operator.descriptor == "Add" {
-                    let l = child.pop().unwrap().eval();
-                    let r = child.pop().unwrap().eval();
-                    if l.is_num() && r.is_num() {
-                        Expression::from(l.to_smart_num().unwrap() + r.to_smart_num().unwrap())
-                    } else {
-                        l + r
-                    }
+                    add_eval_rule(child)
                 } else if operator.descriptor == "Sub" {
-                    let l = child.pop().unwrap().eval();
-                    let r = child.pop().unwrap().eval();
-                    if l.is_num() && r.is_num() {
-                        Expression::from(l.to_smart_num().unwrap() - r.to_smart_num().unwrap())
-                    } else {
-                        l - r
-                    }
+                    sub_eval_rule(child)
                 } else if operator.descriptor == "Mul" {
-                    let l = child.pop().unwrap().eval();
-                    let r = child.pop().unwrap().eval();
-                    if l.is_num() && r.is_num() {
-                        Expression::from(l.to_smart_num().unwrap() * r.to_smart_num().unwrap())
-                    } else {
-                        l * r
-                    }
+                    mul_eval_rule(child)
                 } else if operator.descriptor == "Div" {
-                    let l = child.pop().unwrap().eval();
-                    let r = child.pop().unwrap().eval();
-                    if l.is_num() && r.is_num() {
-                        Expression::from(l.to_smart_num().unwrap() / r.to_smart_num().unwrap())
-                    } else {
-                        l / r
-                    }
+                    div_eval_rule(child)
                 } else {
                     panic!("Aggregation not Implemented for {}", operator.symbol);
                 }
@@ -63,7 +41,29 @@ impl NumericEvaluate for Expression {
     }
 
     fn full_eval(self) -> Self {
-        let x = self.eval();
-        return x;
+        todo!("Not implemented yet")
+    }
+}
+
+#[cfg(test)]
+mod eval_tests {
+    use crate::{
+        ast::ast_node::Expression,
+        smart_num::{SmartNum, ToSmartNum, val_holder::IsClose},
+    };
+
+    use super::NumericEvaluate;
+
+    #[test]
+    fn eval() {
+        let a = Expression::from(1_u32);
+        let b = Expression::from(2_u32);
+        let c = Expression::from(3_u32);
+        let d = Expression::from(4_u32);
+        let e = Expression::from(5_u32);
+        let x = -(a + b) * (c - d) / e; // -(1+2)*(3-4)/5 == 3/5
+        let ans = x.eval().to_smart_num().unwrap();
+        let expected = SmartNum::new_rational(1, 3, 5).unwrap();
+        assert!(ans.is_close(expected, 1e-9));
     }
 }

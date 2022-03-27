@@ -1,5 +1,7 @@
 #[cfg(test)]
 mod smart_num_tests {
+    use crate::smart_num::val_holder::IsClose;
+
     use super::super::SmartNum;
 
     fn gen_range() -> Vec<i64> {
@@ -36,7 +38,7 @@ mod smart_num_tests {
         for i in gen_range() {
             let x = SmartNum::from(i);
             let y = SmartNum::from(-i);
-            assert!(x.near(&(-y), 1e-9));
+            assert!(x.is_close(-y, 1e-9));
         }
     }
 
@@ -44,7 +46,7 @@ mod smart_num_tests {
         for i in gen_range() {
             let x = SmartNum::from(i as f64);
             let y = SmartNum::from(-i as f64);
-            assert!(x.near(&(-y), 1e-9));
+            assert!(x.is_close(-y, 1e-9));
         }
     }
 
@@ -70,7 +72,7 @@ mod smart_num_tests {
             let y = j as f64;
             let ans = SmartNum::from(x) + SmartNum::from(y);
             let check = SmartNum::from(x + y);
-            assert!(ans.near(&check, 1e-9));
+            assert!(ans.is_close(check, 1e-9));
         }
     }
 
@@ -80,7 +82,7 @@ mod smart_num_tests {
             let y = j as f64;
             let ans = SmartNum::from(x) + SmartNum::from(y);
             let check = SmartNum::from(x as f64 + y);
-            assert!(ans.near(&check, 1e-9));
+            assert!(ans.is_close(check, 1e-9));
         }
     }
 
@@ -93,7 +95,7 @@ mod smart_num_tests {
             let check = SmartNum::from((i as f64) + (j as f64) / (k as f64));
             let ans = SmartNum::from(i)
                 + SmartNum::new_rational(s, j.abs() as u64, k.abs() as u64).unwrap();
-            assert!(ans.near(&check, 1e-9));
+            assert!(ans.is_close(check, 1e-9));
         }
     }
 
@@ -121,7 +123,7 @@ mod smart_num_tests {
             let y = j as f64;
             let ans = SmartNum::from(x) - SmartNum::from(y);
             let check = SmartNum::from(x - y);
-            assert!(ans.near(&check, 1e-9));
+            assert!(ans.is_close(check, 1e-9));
         }
     }
 
@@ -131,7 +133,7 @@ mod smart_num_tests {
             let y = j as f64;
             let ans = SmartNum::from(x) - SmartNum::from(y);
             let check = SmartNum::from(x as f64 - y);
-            assert!(ans.near(&check, 1e-9));
+            assert!(ans.is_close(check, 1e-9));
         }
     }
 
@@ -144,7 +146,7 @@ mod smart_num_tests {
             let check = SmartNum::from((i as f64) - (j as f64) / (k as f64));
             let ans = SmartNum::from(i)
                 - SmartNum::new_rational(s, j.abs() as u64, k.abs() as u64).unwrap();
-            assert!(ans.near(&check, 1e-9));
+            assert!(ans.is_close(check, 1e-9));
         }
     }
 
@@ -172,7 +174,7 @@ mod smart_num_tests {
             let y = j as f64;
             let ans = SmartNum::from(x) * SmartNum::from(y);
             let check = SmartNum::from(x * y);
-            assert!(ans.near(&check, 1e-9));
+            assert!(ans.is_close(check, 1e-9));
         }
     }
 
@@ -182,7 +184,7 @@ mod smart_num_tests {
             let y = j as f64;
             let ans = SmartNum::from(x) * SmartNum::from(y);
             let check = SmartNum::from(x as f64 * y);
-            assert!(ans.near(&check, 1e-9));
+            assert!(ans.is_close(check, 1e-9));
         }
     }
 
@@ -195,7 +197,7 @@ mod smart_num_tests {
             let check = SmartNum::from((i as f64) * (j as f64) / (k as f64));
             let ans = SmartNum::from(i)
                 * SmartNum::new_rational(s, j.abs() as u64, k.abs() as u64).unwrap();
-            assert!(ans.near(&check, 1e-9));
+            assert!(ans.is_close(check, 1e-9));
         }
     }
 
@@ -212,11 +214,10 @@ mod smart_num_tests {
             if j == 0 {
                 continue;
             }
-            let x = i as i64;
-            let y = j as i64;
-            let ans = SmartNum::from(x) / SmartNum::from(y);
-            let check = SmartNum::from(x / y);
-            assert_eq!(ans.to_i64(), check.to_i64());
+            let ans = SmartNum::from(i) / SmartNum::from(j);
+            let s = if i == 0 { 1 } else { (i * j).signum() };
+            let check = SmartNum::new_rational(s, i.abs() as u64, j.abs() as u64).unwrap();
+            assert!(ans.is_close(check, 1e-9));
         }
     }
 
@@ -229,7 +230,7 @@ mod smart_num_tests {
             let y = j as f64;
             let ans = SmartNum::from(x) / SmartNum::from(y);
             let check = SmartNum::from(x / y);
-            assert!(ans.near(&check, 1e-9));
+            assert!(ans.is_close(check, 1e-9));
         }
     }
 
@@ -242,7 +243,7 @@ mod smart_num_tests {
             let y = j as f64;
             let ans = SmartNum::from(x) / SmartNum::from(y);
             let check = SmartNum::from(x as f64 / y);
-            assert!(ans.near(&check, 1e-9));
+            assert!(ans.is_close(check, 1e-9));
         }
     }
 
@@ -255,7 +256,7 @@ mod smart_num_tests {
             let check = SmartNum::from((i as f64) / ((j as f64) / (k as f64)));
             let ans = SmartNum::from(i)
                 / SmartNum::new_rational(s, j.abs() as u64, k.abs() as u64).unwrap();
-            assert!(ans.near(&check, 1e-9));
+            assert!(ans.is_close(check, 1e-9));
         }
     }
 
@@ -432,15 +433,15 @@ mod rational_tests {
 
 #[cfg(test)]
 mod special_const_tests {
-    use crate::smart_num::SmartNum;
+    use crate::smart_num::{SmartNum, val_holder::IsClose};
 
     #[test]
     fn string_fmt() {
         let pi = SmartNum::pi();
         assert_eq!(pi.to_string(), "pi");
-        assert!(pi.near(&SmartNum::from(3.14), 1e-1));
+        assert!(pi.is_close(SmartNum::from(3.14), 1e-1));
         let e = SmartNum::e();
         assert_eq!(e.to_string(), "e");
-        assert!(e.near(&SmartNum::from(2.7), 1e-1));
+        assert!(e.is_close(SmartNum::from(2.7), 1e-1));
     }
 }

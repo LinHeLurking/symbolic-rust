@@ -1,8 +1,11 @@
 use std::ops::Neg;
 
-use crate::ast::{
-    ast_node::{AstNode, Expression},
-    op::AstOperator,
+use crate::{
+    ast::{
+        ast_node::{AstNode, Expression},
+        op::AstOperator,
+    },
+    compute::evaluate::NumericEvaluate, smart_num::ToSmartNum,
 };
 
 fn gen_op_nge() -> AstOperator {
@@ -24,10 +27,19 @@ impl Neg for Expression {
     }
 }
 
+pub(crate) fn neg_eval_rule(mut child: Vec<Expression>) -> Expression {
+    let sub = child.pop().unwrap().eval();
+    if sub.is_num() {
+        Expression::from(-sub.to_smart_num().unwrap())
+    } else {
+        -sub
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::Expression;
-    use crate::compute::evaluate::NumericEvaluate;
+    use crate::{compute::evaluate::NumericEvaluate, smart_num::ToSmartNum};
 
     #[test]
     fn neg() {

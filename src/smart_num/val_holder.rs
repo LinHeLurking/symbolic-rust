@@ -14,6 +14,10 @@ pub(super) enum SmartNumVal {
     Real(f64),
 }
 
+pub trait IsClose<RHS = Self> {
+    fn is_close(self, rhs: RHS, eps: f64) -> bool;
+}
+
 impl Display for SmartNumVal {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let content = match self {
@@ -70,16 +74,24 @@ impl SmartNumVal {
         RationalNum::new(sign, nominator, denominator).and_then(|v| Some(SmartNumVal::Rational(v)))
     }
 
-    pub fn near(&self, rhs: &Self, eps: f64) -> bool {
-        return (self.to_f64() - rhs.to_f64()).abs() < eps;
-    }
-
     pub fn zero() -> SmartNumVal {
         SmartNumVal::from(0_i64)
     }
 
     pub fn one() -> SmartNumVal {
         SmartNumVal::from(1_i64)
+    }
+}
+
+impl IsClose<SmartNumVal> for SmartNumVal {
+    fn is_close(self, rhs: SmartNumVal, eps: f64) -> bool {
+        return (self.to_f64() - rhs.to_f64()).abs() < eps;
+    }
+}
+
+impl IsClose<&SmartNumVal> for &SmartNumVal {
+    fn is_close(self, rhs: &SmartNumVal, eps: f64) -> bool {
+        return (self.to_f64() - rhs.to_f64()).abs() < eps;
     }
 }
 
@@ -246,7 +258,9 @@ impl Div for &SmartNumVal {
     fn div(self, rhs: Self) -> Self::Output {
         match self {
             SmartNumVal::Integer(i) => match rhs {
-                SmartNumVal::Integer(j) => SmartNumVal::Integer(*i / *j),
+                SmartNumVal::Integer(j) => {
+                    SmartNumVal::Rational(RationalNum::from(*i) / RationalNum::from(*j))
+                }
                 SmartNumVal::Rational(j) => SmartNumVal::Rational(RationalNum::from(*i) / *j),
                 SmartNumVal::Real(j) => SmartNumVal::Real((*i as f64) / *j),
             },

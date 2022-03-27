@@ -6,7 +6,10 @@ use std::{
     ops::{Add, Div, Mul, Neg, Sub},
 };
 
-use self::{special_const::SpecialConst, val_holder::SmartNumVal};
+use self::{
+    special_const::SpecialConst,
+    val_holder::{IsClose, SmartNumVal},
+};
 
 pub mod rational;
 pub mod special_const;
@@ -36,10 +39,6 @@ impl SmartNum {
     pub fn new_rational(sign: i64, nominator: u64, denominator: u64) -> Option<SmartNum> {
         SmartNumVal::new_rational(sign, nominator, denominator)
             .and_then(|value| Some(SmartNum { value, tag: None }))
-    }
-
-    pub fn near(&self, other: &Self, eps: f64) -> bool {
-        self.value.near(&other.value, eps)
     }
 
     pub fn one() -> SmartNum {
@@ -78,6 +77,18 @@ impl Display for SmartNum {
         } else {
             write!(f, "{}", self.value.to_string())
         }
+    }
+}
+
+impl IsClose<SmartNum> for SmartNum {
+    fn is_close(self, other: SmartNum, eps: f64) -> bool {
+        self.value.is_close(other.value, eps)
+    }
+}
+
+impl IsClose<&SmartNum> for &SmartNum {
+    fn is_close(self, other: &SmartNum, eps: f64) -> bool {
+        (&self.value).is_close(&other.value, eps)
     }
 }
 

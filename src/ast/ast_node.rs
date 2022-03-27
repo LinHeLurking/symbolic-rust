@@ -74,12 +74,18 @@ impl Expression {
         match &self.root {
             AstNode::Operand(v) => v.to_string(),
             AstNode::Operator(op) => {
-                let me = format!(
-                    "{} {} {}",
-                    self.child[0].to_string_raw(op.priority),
-                    op,
-                    self.child[1].to_string_raw(op.priority),
-                );
+                let me = if self.child.len() == 2 {
+                    // binary operator
+                    format!(
+                        "{} {} {}",
+                        self.child[0].to_string_raw(op.priority),
+                        op,
+                        self.child[1].to_string_raw(op.priority),
+                    )
+                } else {
+                    // unary operator
+                    format!("{}{}", op, self.child[0].to_string_raw(op.priority),)
+                };
                 if op.priority < upper_priority {
                     format!("({})", me)
                 } else {
