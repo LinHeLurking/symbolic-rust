@@ -4,7 +4,6 @@ use std::{error::Error, fmt::Display};
 
 use crate::{
     ast::{op::operand::Variable, tree::Expression},
-    compute::derivative::{Derivative, DerivativeError},
     smart_num::SmartNum,
 };
 

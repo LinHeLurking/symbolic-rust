@@ -1,6 +1,6 @@
 mod rules;
 
-use std::{borrow::Borrow, error::Error, fmt::Display};
+use std::fmt::Display;
 
 use crate::ast::{
     op::{

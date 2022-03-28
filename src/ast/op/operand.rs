@@ -37,6 +37,15 @@ impl<'a> From<&'a AstOperand> for Option<&'a Variable> {
     }
 }
 
+impl From<AstOperand> for Option<Variable> {
+    fn from(operand: AstOperand) -> Self {
+        match operand {
+            AstOperand::Num(_) => None,
+            AstOperand::Variable(variable) => Some(variable),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct OperandIsNotNumberError {}
 

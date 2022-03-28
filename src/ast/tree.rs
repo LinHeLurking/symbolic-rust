@@ -185,6 +185,15 @@ impl<'a> From<&'a Expression> for Option<&'a Variable> {
     }
 }
 
+impl From<Expression> for Option<Variable> {
+    fn from(expr: Expression) -> Self {
+        match expr.root {
+            AstNode::Operator(_) => None,
+            AstNode::Operand(operand) => operand.into(),
+        }
+    }
+}
+
 impl From<Variable> for Expression {
     fn from(v: Variable) -> Self {
         Expression::new_variable(v.name.as_str())
