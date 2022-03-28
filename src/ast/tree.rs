@@ -1,6 +1,9 @@
 #![allow(dead_code)]
 
-use super::op::{operand::{AstOperand, ToVariable, Variable}, operator::AstOperator};
+use super::op::{
+    operand::{ AstOperand, Variable},
+    operator::AstOperator,
+};
 use crate::smart_num::{SmartNum, ToSmartNum};
 use std::{error::Error, fmt::Display};
 
@@ -173,26 +176,11 @@ where
     }
 }
 
-impl ToVariable for &Expression {
-    fn to_variable(self) -> Option<Variable> {
-        match &self.root {
+impl<'a> From<&'a Expression> for Option<&'a Variable> {
+    fn from(expr: &'a Expression) -> Self {
+        match &expr.root {
             AstNode::Operator(_) => None,
-            AstNode::Operand(operand) => match operand {
-                AstOperand::Num(_) => None,
-                AstOperand::Variable(variable) => Some(variable.clone()),
-            },
-        }
-    }
-}
-
-impl ToVariable for Expression {
-    fn to_variable(self) -> Option<Variable> {
-        match self.root {
-            AstNode::Operator(_) => None,
-            AstNode::Operand(operand) => match operand {
-                AstOperand::Num(_) => None,
-                AstOperand::Variable(variable) => Some(variable),
-            },
+            AstNode::Operand(operand) => operand.into(),
         }
     }
 }

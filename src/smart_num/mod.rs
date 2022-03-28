@@ -11,8 +11,8 @@ use self::{
     val_holder::{IsClose, SmartNumVal},
 };
 
-pub mod rational;
-pub mod special_const;
+mod rational;
+mod special_const;
 mod tests;
 pub(super) mod val_holder;
 

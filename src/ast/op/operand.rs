@@ -16,19 +16,9 @@ impl Variable {
     }
 }
 
-pub(crate) trait ToVariable {
-    fn to_variable(self) -> Option<Variable>;
-}
-
-impl ToVariable for &Variable {
-    fn to_variable(self) -> Option<Variable> {
-        Some(self.clone())
-    }
-}
-
-impl ToVariable for Variable {
-    fn to_variable(self) -> Option<Variable> {
-        Some(self)
+impl Display for Variable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.name)
     }
 }
 
@@ -36,6 +26,15 @@ impl ToVariable for Variable {
 pub enum AstOperand {
     Num(SmartNum),
     Variable(Variable),
+}
+
+impl<'a> From<&'a AstOperand> for Option<&'a Variable> {
+    fn from(operand: &'a AstOperand) -> Self {
+        match operand {
+            AstOperand::Num(_) => None,
+            AstOperand::Variable(variable) => Some(variable),
+        }
+    }
 }
 
 #[derive(Debug)]

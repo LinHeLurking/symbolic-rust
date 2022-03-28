@@ -1,8 +1,10 @@
 mod rules;
 
+use std::{error::Error, fmt::Display};
+
 use crate::ast::{
     op::{
-        operand::{AstOperand, ToVariable},
+        operand::{AstOperand, Variable},
         operator::OperatorType,
     },
     tree::{AstNode, Expression},
@@ -16,21 +18,40 @@ use self::rules::{
 
 use super::num_aggregate::NumAggregate;
 
-pub(crate) trait Derivative<T: ToVariable> {
+pub(crate) trait Derivative<'a, T> {
     type Output;
     fn derivative(self, to: T) -> Self::Output;
 }
 
-impl<T: ToVariable> Derivative<T> for Expression {
-    type Output = Expression;
+#[derive(Debug)]
+pub struct DerivativeError {}
 
-    fn derivative(self, to: T) -> Self::Output {
-        let variable = to.to_variable().unwrap();
-        match self.root {
+impl Error for DerivativeError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        None
+    }
+}
+
+impl Display for DerivativeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Cannot be used as a variable")
+    }
+}
+
+impl<'a, T: 'a> Derivative<'a, T> for Expression
+where
+    T: ToString + Display,
+    Option<&'a Variable>: From<T>,
+{
+    type Output = Result<Expression, DerivativeError>;
+
+    fn derivative(self, to_: T) -> Self::Output {
+        let to = Into::<Option<&Variable>>::into(to_).ok_or(DerivativeError {})?;
+        let result = match self.root {
             AstNode::Operand(operand) => match operand {
                 AstOperand::Num(_) => Expression::from(0_i64),
                 AstOperand::Variable(another) => {
-                    if variable.name == another.name {
+                    if to.name == another.name {
                         Expression::from(1_i64)
                     } else {
                         Expression::from(0_i64)
@@ -40,17 +61,18 @@ impl<T: ToVariable> Derivative<T> for Expression {
             AstNode::Operator(operator) => {
                 let child = self.child;
                 match operator.descriptor {
-                    OperatorType::Neg => neg_derivative_rule(child, &variable),
-                    OperatorType::Add => add_derivative_rule(child, &variable),
-                    OperatorType::Sub => sub_derivative_rule(child, &variable),
-                    OperatorType::Mul => mul_derivative_rule(child, &variable),
-                    OperatorType::Div => div_derivative_rule(child, &variable),
-                    OperatorType::Sin => sin_derivative_rule(child, &variable),
-                    OperatorType::Cos => cos_derivative_rule(child, &variable),
+                    OperatorType::Neg => neg_derivative_rule(child, to)?,
+                    OperatorType::Add => add_derivative_rule(child, to)?,
+                    OperatorType::Sub => sub_derivative_rule(child, to)?,
+                    OperatorType::Mul => mul_derivative_rule(child, to)?,
+                    OperatorType::Div => div_derivative_rule(child, to)?,
+                    OperatorType::Sin => sin_derivative_rule(child, to)?,
+                    OperatorType::Cos => cos_derivative_rule(child, to)?,
                 }
             }
         }
-        .num_aggregate()
+        .num_aggregate();
+        Ok(result)
     }
 }
 
@@ -70,7 +92,7 @@ mod derivative_tests {
             let sin_x = sin(x.clone());
             let cos_u = cos(u.clone());
             let y = sin_x * cos_u;
-            let y_d_x = y.derivative(x);
+            let y_d_x = y.derivative(&x).unwrap();
             println!("{}", y_d_x);
             assert_eq!(y_d_x.to_string(), "cosx * cosu");
         }
@@ -81,7 +103,7 @@ mod derivative_tests {
                 let sin_x = sin(x.clone());
                 let cos_u = cos(u.clone());
                 let y = sin_x * cos_u;
-                let y_d_u = y.derivative(u);
+                let y_d_u = y.derivative(&u).unwrap();
                 println!("{}", y_d_u);
                 assert_eq!(y_d_u.to_string(), "sinx * (-sinu)");
             }
@@ -89,7 +111,7 @@ mod derivative_tests {
         {
             let x = Expression::new_variable("x");
             let y = sin(x.clone()) * sin(x.clone()) * x.clone();
-            println!("{}", y.derivative(x));
+            println!("{}", y.derivative(&x).unwrap());
         }
     }
 }
