@@ -189,6 +189,14 @@ mod smart_num_tests {
     }
 
     fn mul_ir() {
+        let i = -100_i64;
+        let j = -99_i64;
+        let k = 99_i64;
+        let s = if j * k >= 0 { 1_i64 } else { -1_i64 };
+        let check = SmartNum::from((i as f64) * (j as f64) / (k as f64));
+        let ans =
+            SmartNum::from(i) * SmartNum::new_rational(s, j.abs() as u64, k.abs() as u64).unwrap();
+        assert!(ans.is_close(check, 1e-9));
         for (i, j, k) in gen_triple_range() {
             if k == 0 {
                 continue;
@@ -433,7 +441,7 @@ mod rational_tests {
 
 #[cfg(test)]
 mod special_const_tests {
-    use crate::smart_num::{SmartNum, val_holder::IsClose};
+    use crate::smart_num::{val_holder::IsClose, SmartNum};
 
     #[test]
     fn string_fmt() {

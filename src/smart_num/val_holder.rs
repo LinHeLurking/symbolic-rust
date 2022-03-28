@@ -5,7 +5,7 @@ use std::{
     ops::{Add, Div, Mul, Neg, Sub},
 };
 
-use super::{rational::RationalNum};
+use super::rational::RationalNum;
 
 #[derive(Debug, Clone, Copy)]
 pub(super) enum SmartNumVal {
@@ -51,6 +51,24 @@ impl SmartNumVal {
             SmartNumVal::Integer(_) => false,
             SmartNumVal::Rational(_) => false,
             SmartNumVal::Real(_) => true,
+        }
+    }
+
+    pub fn is_zero(&self) -> bool {
+        match self {
+            SmartNumVal::Integer(v) => *v == 0,
+            SmartNumVal::Rational(v) => v.nominator == 0 && v.denominator != 0,
+            SmartNumVal::Real(_) => false,
+        }
+    }
+
+    pub fn is_one(&self) -> bool {
+        match self {
+            SmartNumVal::Integer(v) => *v == 1,
+            SmartNumVal::Rational(v) => {
+                v.sign == 1 && v.nominator == v.denominator && v.denominator != 0
+            }
+            SmartNumVal::Real(_) => false,
         }
     }
 
@@ -156,57 +174,25 @@ impl From<u64> for SmartNumVal {
     }
 }
 
-impl Add for &SmartNumVal {
-    type Output = SmartNumVal;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        match self {
-            SmartNumVal::Integer(i) => match rhs {
-                SmartNumVal::Integer(j) => SmartNumVal::Integer(*i + *j),
-                SmartNumVal::Rational(j) => SmartNumVal::Rational(RationalNum::from(*i) + *j),
-                SmartNumVal::Real(j) => SmartNumVal::Real((*i as f64) + *j),
-            },
-            SmartNumVal::Rational(i) => match rhs {
-                SmartNumVal::Integer(j) => SmartNumVal::Rational(*i + RationalNum::from(*j)),
-                SmartNumVal::Rational(j) => SmartNumVal::Rational(*i + *j),
-                SmartNumVal::Real(j) => SmartNumVal::Real(i.to_f64() + *j),
-            },
-            SmartNumVal::Real(i) => match rhs {
-                SmartNumVal::Integer(j) => SmartNumVal::Real(*i + (*j as f64)),
-                SmartNumVal::Rational(j) => SmartNumVal::Real(*i + j.to_f64()),
-                SmartNumVal::Real(j) => SmartNumVal::Real(*i + *j),
-            },
-        }
-    }
-}
-
 impl Add for SmartNumVal {
     type Output = SmartNumVal;
 
     fn add(self, rhs: Self) -> Self::Output {
-        &self + &rhs
-    }
-}
-
-impl Sub for &SmartNumVal {
-    type Output = SmartNumVal;
-
-    fn sub(self, rhs: Self) -> Self::Output {
         match self {
             SmartNumVal::Integer(i) => match rhs {
-                SmartNumVal::Integer(j) => SmartNumVal::Integer(*i - *j),
-                SmartNumVal::Rational(j) => SmartNumVal::Rational(RationalNum::from(*i) - *j),
-                SmartNumVal::Real(j) => SmartNumVal::Real((*i as f64) - *j),
+                SmartNumVal::Integer(j) => SmartNumVal::Integer(i + j),
+                SmartNumVal::Rational(j) => SmartNumVal::Rational(RationalNum::from(i) + j),
+                SmartNumVal::Real(j) => SmartNumVal::Real((i as f64) + j),
             },
             SmartNumVal::Rational(i) => match rhs {
-                SmartNumVal::Integer(j) => SmartNumVal::Rational(*i - RationalNum::from(*j)),
-                SmartNumVal::Rational(j) => SmartNumVal::Rational(*i - *j),
-                SmartNumVal::Real(j) => SmartNumVal::Real(i.to_f64() - *j),
+                SmartNumVal::Integer(j) => SmartNumVal::Rational(i + RationalNum::from(j)),
+                SmartNumVal::Rational(j) => SmartNumVal::Rational(i + j),
+                SmartNumVal::Real(j) => SmartNumVal::Real(i.to_f64() + j),
             },
             SmartNumVal::Real(i) => match rhs {
-                SmartNumVal::Integer(j) => SmartNumVal::Real(*i - (*j as f64)),
-                SmartNumVal::Rational(j) => SmartNumVal::Real(*i - j.to_f64()),
-                SmartNumVal::Real(j) => SmartNumVal::Real(*i - *j),
+                SmartNumVal::Integer(j) => SmartNumVal::Real(i + (j as f64)),
+                SmartNumVal::Rational(j) => SmartNumVal::Real(i + j.to_f64()),
+                SmartNumVal::Real(j) => SmartNumVal::Real(i + j),
             },
         }
     }
@@ -216,29 +202,21 @@ impl Sub for SmartNumVal {
     type Output = SmartNumVal;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        &self - &rhs
-    }
-}
-
-impl Mul for &SmartNumVal {
-    type Output = SmartNumVal;
-
-    fn mul(self, rhs: Self) -> Self::Output {
         match self {
             SmartNumVal::Integer(i) => match rhs {
-                SmartNumVal::Integer(j) => SmartNumVal::Integer(*i * *j),
-                SmartNumVal::Rational(j) => SmartNumVal::Rational(RationalNum::from(*i) * *j),
-                SmartNumVal::Real(j) => SmartNumVal::Real((*i as f64) * *j),
+                SmartNumVal::Integer(j) => SmartNumVal::Integer(i - j),
+                SmartNumVal::Rational(j) => SmartNumVal::Rational(RationalNum::from(i) - j),
+                SmartNumVal::Real(j) => SmartNumVal::Real((i as f64) - j),
             },
             SmartNumVal::Rational(i) => match rhs {
-                SmartNumVal::Integer(j) => SmartNumVal::Rational(*i * RationalNum::from(*j)),
-                SmartNumVal::Rational(j) => SmartNumVal::Rational(*i * *j),
-                SmartNumVal::Real(j) => SmartNumVal::Real(i.to_f64() * *j),
+                SmartNumVal::Integer(j) => SmartNumVal::Rational(i - RationalNum::from(j)),
+                SmartNumVal::Rational(j) => SmartNumVal::Rational(i - j),
+                SmartNumVal::Real(j) => SmartNumVal::Real(i.to_f64() - j),
             },
             SmartNumVal::Real(i) => match rhs {
-                SmartNumVal::Integer(j) => SmartNumVal::Real(*i * (*j as f64)),
-                SmartNumVal::Rational(j) => SmartNumVal::Real(*i * j.to_f64()),
-                SmartNumVal::Real(j) => SmartNumVal::Real(*i * *j),
+                SmartNumVal::Integer(j) => SmartNumVal::Real(i - (j as f64)),
+                SmartNumVal::Rational(j) => SmartNumVal::Real(i - j.to_f64()),
+                SmartNumVal::Real(j) => SmartNumVal::Real(i - j),
             },
         }
     }
@@ -248,32 +226,26 @@ impl Mul for SmartNumVal {
     type Output = SmartNumVal;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        &self * &rhs
-    }
-}
-
-impl Div for &SmartNumVal {
-    type Output = SmartNumVal;
-
-    fn div(self, rhs: Self) -> Self::Output {
-        match self {
-            SmartNumVal::Integer(i) => match rhs {
-                SmartNumVal::Integer(j) => {
-                    SmartNumVal::Rational(RationalNum::from(*i) / RationalNum::from(*j))
-                }
-                SmartNumVal::Rational(j) => SmartNumVal::Rational(RationalNum::from(*i) / *j),
-                SmartNumVal::Real(j) => SmartNumVal::Real((*i as f64) / *j),
-            },
-            SmartNumVal::Rational(i) => match rhs {
-                SmartNumVal::Integer(j) => SmartNumVal::Rational(*i / RationalNum::from(*j)),
-                SmartNumVal::Rational(j) => SmartNumVal::Rational(*i / *j),
-                SmartNumVal::Real(j) => SmartNumVal::Real(i.to_f64() / *j),
-            },
-            SmartNumVal::Real(i) => match rhs {
-                SmartNumVal::Integer(j) => SmartNumVal::Real(*i / (*j as f64)),
-                SmartNumVal::Rational(j) => SmartNumVal::Real(*i / j.to_f64()),
-                SmartNumVal::Real(j) => SmartNumVal::Real(*i / *j),
-            },
+        if self.is_zero() || rhs.is_zero() {
+            SmartNumVal::Integer(0_i64)
+        } else {
+            match self {
+                SmartNumVal::Integer(i) => match rhs {
+                    SmartNumVal::Integer(j) => SmartNumVal::Integer(i * j),
+                    SmartNumVal::Rational(j) => SmartNumVal::Rational(RationalNum::from(i) * j),
+                    SmartNumVal::Real(j) => SmartNumVal::Real((i as f64) * j),
+                },
+                SmartNumVal::Rational(i) => match rhs {
+                    SmartNumVal::Integer(j) => SmartNumVal::Rational(i * RationalNum::from(j)),
+                    SmartNumVal::Rational(j) => SmartNumVal::Rational(i * j),
+                    SmartNumVal::Real(j) => SmartNumVal::Real(i.to_f64() * j),
+                },
+                SmartNumVal::Real(i) => match rhs {
+                    SmartNumVal::Integer(j) => SmartNumVal::Real(i * (j as f64)),
+                    SmartNumVal::Rational(j) => SmartNumVal::Real(i * j.to_f64()),
+                    SmartNumVal::Real(j) => SmartNumVal::Real(i * j),
+                },
+            }
         }
     }
 }
@@ -282,7 +254,29 @@ impl Div for SmartNumVal {
     type Output = SmartNumVal;
 
     fn div(self, rhs: Self) -> Self::Output {
-        &self / &rhs
+        if self.is_zero() {
+            SmartNumVal::Integer(0_i64)
+        } else {
+            match self {
+                SmartNumVal::Integer(i) => match rhs {
+                    SmartNumVal::Integer(j) => {
+                        SmartNumVal::Rational(RationalNum::from(i) / RationalNum::from(j))
+                    }
+                    SmartNumVal::Rational(j) => SmartNumVal::Rational(RationalNum::from(i) / j),
+                    SmartNumVal::Real(j) => SmartNumVal::Real((i as f64) / j),
+                },
+                SmartNumVal::Rational(i) => match rhs {
+                    SmartNumVal::Integer(j) => SmartNumVal::Rational(i / RationalNum::from(j)),
+                    SmartNumVal::Rational(j) => SmartNumVal::Rational(i / j),
+                    SmartNumVal::Real(j) => SmartNumVal::Real(i.to_f64() / j),
+                },
+                SmartNumVal::Real(i) => match rhs {
+                    SmartNumVal::Integer(j) => SmartNumVal::Real(i / (j as f64)),
+                    SmartNumVal::Rational(j) => SmartNumVal::Real(i / j.to_f64()),
+                    SmartNumVal::Real(j) => SmartNumVal::Real(i / j),
+                },
+            }
+        }
     }
 }
 

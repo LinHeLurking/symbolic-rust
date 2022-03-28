@@ -14,7 +14,7 @@ use self::{
 pub mod rational;
 pub mod special_const;
 mod tests;
-pub mod val_holder;
+pub(super) mod val_holder;
 
 #[derive(Debug, Clone, Copy)]
 pub struct SmartNum {
@@ -40,7 +40,13 @@ impl SmartNum {
         SmartNumVal::new_rational(sign, nominator, denominator).and_then(|value| {
             Some(SmartNum {
                 value,
-                tag: ConstType::Nothing,
+                tag: if value.is_zero() {
+                    ConstType::Zero
+                } else if value.is_one() {
+                    ConstType::One
+                } else {
+                    ConstType::Nothing
+                },
             })
         })
     }
@@ -118,8 +124,27 @@ where
 {
     fn from(v: T) -> Self {
         let value: SmartNumVal = v.into();
-        let tag = gen_tag(&value);
+        let tag = if value.is_one() {
+            ConstType::One
+        } else if value.is_zero() {
+            ConstType::Zero
+        } else {
+            ConstType::Nothing
+        };
         SmartNum { value, tag }
+    }
+}
+
+fn wrap_val(value: SmartNumVal) -> SmartNum {
+    if value.is_zero() {
+        SmartNum::zero()
+    } else if value.is_one() {
+        SmartNum::one()
+    } else {
+        SmartNum {
+            value,
+            tag: ConstType::Nothing,
+        }
     }
 }
 
@@ -127,36 +152,7 @@ impl Neg for SmartNum {
     type Output = SmartNum;
 
     fn neg(self) -> Self::Output {
-        SmartNum {
-            value: -self.value,
-            tag: self.tag,
-        }
-    }
-}
-
-impl Neg for &SmartNum {
-    type Output = SmartNum;
-
-    fn neg(self) -> Self::Output {
-        SmartNum {
-            value: -&self.value,
-            tag: self.tag,
-        }
-    }
-}
-
-fn gen_tag(value: &SmartNumVal) -> ConstType {
-    if !value.is_int() {
-        ConstType::Nothing
-    } else {
-        let i = value.to_i64().unwrap();
-        if i == 0 {
-            ConstType::Zero
-        } else if i == 1 {
-            ConstType::One
-        } else {
-            ConstType::Nothing
-        }
+        wrap_val(-self.value)
     }
 }
 
@@ -164,19 +160,13 @@ impl Add for SmartNum {
     type Output = SmartNum;
 
     fn add(self, rhs: Self) -> Self::Output {
-        let value = self.value + rhs.value;
-        let tag = gen_tag(&value);
-        SmartNum { value, tag }
-    }
-}
-
-impl Add for &SmartNum {
-    type Output = SmartNum;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        let value = &self.value + &rhs.value;
-        let tag = gen_tag(&value);
-        SmartNum { value, tag }
+        if self.is_zero() {
+            rhs
+        } else if rhs.is_zero() {
+            self
+        } else {
+            wrap_val(self.value + rhs.value)
+        }
     }
 }
 
@@ -184,19 +174,13 @@ impl Sub for SmartNum {
     type Output = SmartNum;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        let value = self.value - rhs.value;
-        let tag = gen_tag(&value);
-        SmartNum { value, tag }
-    }
-}
-
-impl Sub for &SmartNum {
-    type Output = SmartNum;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        let value = &self.value - &rhs.value;
-        let tag = gen_tag(&value);
-        SmartNum { value, tag }
+        if self.is_zero() {
+            -rhs
+        } else if rhs.is_zero() {
+            self
+        } else {
+            wrap_val(self.value - rhs.value)
+        }
     }
 }
 
@@ -204,19 +188,13 @@ impl Mul for SmartNum {
     type Output = SmartNum;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        let value = self.value * rhs.value;
-        let tag = gen_tag(&value);
-        SmartNum { value, tag }
-    }
-}
-
-impl Mul for &SmartNum {
-    type Output = SmartNum;
-
-    fn mul(self, rhs: Self) -> Self::Output {
-        let value = &self.value * &rhs.value;
-        let tag = gen_tag(&value);
-        SmartNum { value, tag }
+        if self.is_one() {
+            rhs
+        } else if rhs.is_one() {
+            self
+        } else {
+            wrap_val(self.value * rhs.value)
+        }
     }
 }
 
@@ -224,18 +202,6 @@ impl Div for SmartNum {
     type Output = SmartNum;
 
     fn div(self, rhs: Self) -> Self::Output {
-        let value = self.value / rhs.value;
-        let tag = gen_tag(&value);
-        SmartNum { value, tag }
-    }
-}
-
-impl Div for &SmartNum {
-    type Output = SmartNum;
-
-    fn div(self, rhs: Self) -> Self::Output {
-        let value = &self.value / &rhs.value;
-        let tag = gen_tag(&value);
-        SmartNum { value, tag }
+        wrap_val(self.value / rhs.value)
     }
 }
