@@ -1,13 +1,14 @@
-use crate::{
-    ast::{
-        ast_node::{AstNode, Expression},
-        op::{AstOperand, ToVariable},
-    },
-    math_op::{
-        add::add_derivative_rule, cos::cos_derivative_rule, div::div_derivative_rule,
-        mul::mul_derivative_rule, neg::neg_derivative_rule, sin::sin_derivative_rule,
-        sub::sub_derivative_rule,
-    },
+pub(super) mod rules;
+
+use crate::ast::{
+    ast_node::{AstNode, Expression},
+    op::{AstOperand, ToVariable},
+};
+
+use self::rules::{
+    add::add_derivative_rule, cos::cos_derivative_rule, div::div_derivative_rule,
+    mul::mul_derivative_rule, neg::neg_derivative_rule, sin::sin_derivative_rule,
+    sub::sub_derivative_rule,
 };
 
 use super::num_aggregate::NumAggregate;

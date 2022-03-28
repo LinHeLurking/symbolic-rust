@@ -3,9 +3,9 @@ use std::ops::Neg;
 use crate::{
     ast::{
         ast_node::{AstNode, Expression},
-        op::{AstOperator, Variable},
+        op::AstOperator,
     },
-    compute::{derivative::Derivative, num_aggregate::NumAggregate},
+    compute::num_aggregate::NumAggregate,
     smart_num::ToSmartNum,
 };
 
@@ -35,11 +35,6 @@ pub(crate) fn neg_eval_rule(mut child: Vec<Expression>) -> Expression {
     } else {
         -sub
     }
-}
-
-pub(crate) fn neg_derivative_rule(mut child: Vec<Expression>, to: &Variable) -> Expression {
-    let sub = child.pop().unwrap().derivative(to);
-    -sub
 }
 
 #[cfg(test)]

@@ -1,14 +1,9 @@
 #![allow(dead_code)]
 
-use crate::{
-    ast::{
-        ast_node::{AstNode, Expression},
-        op::{AstOperator, Variable},
-    },
-    compute::derivative::Derivative,
+use crate::ast::{
+    ast_node::{AstNode, Expression},
+    op::AstOperator,
 };
-
-use super::cos::cos;
 
 fn gen_sin_op() -> AstOperator {
     AstOperator {
@@ -48,12 +43,6 @@ impl Sin for &Expression {
 pub fn sin<T: Into<Expression>>(x: T) -> Expression {
     let expr: Expression = x.into();
     expr.sin()
-}
-
-pub(crate) fn sin_derivative_rule(mut child: Vec<Expression>, to: &Variable) -> Expression {
-    // (sin(u))' = cos(u)*u'
-    let sub = child.pop().unwrap();
-    cos(sub.clone()) * sub.derivative(to)
 }
 
 #[cfg(test)]

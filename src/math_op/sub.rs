@@ -3,9 +3,9 @@ use std::ops::Sub;
 use crate::{
     ast::{
         ast_node::{AstNode, Expression},
-        op::{AstOperator, Variable},
+        op::AstOperator,
     },
-    compute::{derivative::Derivative, num_aggregate::NumAggregate},
+    compute::num_aggregate::NumAggregate,
     smart_num::ToSmartNum,
 };
 
@@ -40,12 +40,6 @@ pub(crate) fn sub_eval_rule(mut child: Vec<Expression>) -> Expression {
     } else {
         l - r
     }
-}
-
-pub(crate) fn sub_derivative_rule(mut child: Vec<Expression>, to: &Variable) -> Expression {
-    let r = child.pop().unwrap().derivative(to);
-    let l = child.pop().unwrap().derivative(to);
-    l - r
 }
 
 #[cfg(test)]

@@ -3,9 +3,9 @@ use std::ops::Div;
 use crate::{
     ast::{
         ast_node::{AstNode, Expression},
-        op::{AstOperator, Variable},
+        op::AstOperator,
     },
-    compute::{derivative::Derivative, num_aggregate::NumAggregate},
+    compute::num_aggregate::NumAggregate,
     smart_num::ToSmartNum,
 };
 
@@ -38,21 +38,12 @@ pub(crate) fn div_eval_rule(mut child: Vec<Expression>) -> Expression {
     }
 }
 
-pub(crate) fn div_derivative_rule(mut child: Vec<Expression>, to: &Variable) -> Expression {
-    // (u/v)' = (u'v - uv')/(v*v)
-    let v = child.pop().unwrap();
-    let u = child.pop().unwrap();
-    let v_d = v.clone().derivative(to);
-    let u_d = u.clone().derivative(to);
-    (u_d * v.clone() - u * v_d) / (v.clone() * v)
-}
-
 #[cfg(test)]
 mod tests {
     use crate::{ast::ast_node::Expression, compute::num_aggregate::NumAggregate};
 
     #[test]
-    fn mul() {
+    fn div() {
         {
             let x = Expression::new_variable("x");
             let y = Expression::new_variable("y");
