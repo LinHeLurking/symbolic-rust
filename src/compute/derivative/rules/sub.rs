@@ -1,5 +1,5 @@
 use crate::{
-    ast::{ast_node::Expression, op::Variable},
+    ast::{tree::Expression, op::operand::Variable},
     compute::derivative::Derivative,
 };
 

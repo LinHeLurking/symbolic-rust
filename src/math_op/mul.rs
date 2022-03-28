@@ -1,15 +1,15 @@
 use std::ops::Mul;
 
 use crate::ast::{
-    ast_node::{AstNode, Expression},
-    op::AstOperator,
+    op::operator::{AstOperator, OperatorType},
+    tree::{AstNode, Expression},
 };
 
 fn gen_op_mul() -> AstOperator {
     AstOperator {
         symbol: "*".to_string(),
         priority: 3_u32,
-        descriptor: "Mul".to_string(),
+        descriptor: OperatorType::Mul,
     }
 }
 
@@ -26,7 +26,7 @@ impl Mul for Expression {
 
 #[cfg(test)]
 mod tests {
-    use crate::{ast::ast_node::Expression, compute::num_aggregate::NumAggregate};
+    use crate::{ast::tree::Expression, compute::num_aggregate::NumAggregate};
 
     #[test]
     fn mul() {

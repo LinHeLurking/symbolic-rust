@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use super::op::*;
+use super::op::{operand::{AstOperand, ToVariable, Variable}, operator::AstOperator};
 use crate::smart_num::{SmartNum, ToSmartNum};
 use std::{error::Error, fmt::Display};
 

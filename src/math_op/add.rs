@@ -1,15 +1,15 @@
 use std::ops::Add;
 
 use crate::ast::{
-    ast_node::{AstNode, Expression},
-    op::AstOperator,
+    op::operator::{AstOperator, OperatorType},
+    tree::{AstNode, Expression},
 };
 
 fn gen_op_add() -> AstOperator {
     AstOperator {
         symbol: "+".to_string(),
         priority: 2_u32,
-        descriptor: "Add".to_string(),
+        descriptor: OperatorType::Add,
     }
 }
 
@@ -26,7 +26,7 @@ impl Add for Expression {
 
 #[cfg(test)]
 mod tests {
-    use crate::{ast::ast_node::Expression, compute::num_aggregate::NumAggregate};
+    use crate::{ast::tree::Expression, compute::num_aggregate::NumAggregate};
 
     #[test]
     fn add() {

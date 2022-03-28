@@ -1,6 +1,9 @@
 mod rules;
 
-use crate::ast::ast_node::{AstNode, Expression};
+use crate::ast::{
+    op::operator::OperatorType,
+    tree::{AstNode, Expression},
+};
 
 use self::rules::{
     add::add_eval_rule, div::div_eval_rule, mul::mul_eval_rule, neg::neg_eval_rule,
@@ -19,23 +22,14 @@ impl NumAggregate for Expression {
     fn num_aggregate(self) -> Self {
         match &self.root {
             AstNode::Operand(_) => self.clone(),
-            AstNode::Operator(operator) => {
-                // TODO: auto query
-                if operator.descriptor == "Neg" {
-                    neg_eval_rule(self.child)
-                } else if operator.descriptor == "Add" {
-                    add_eval_rule(self.child)
-                } else if operator.descriptor == "Sub" {
-                    sub_eval_rule(self.child)
-                } else if operator.descriptor == "Mul" {
-                    mul_eval_rule(self.child)
-                } else if operator.descriptor == "Div" {
-                    div_eval_rule(self.child)
-                } else {
-                    // Not implemented evaluation
-                    self
-                }
-            }
+            AstNode::Operator(operator) => match operator.descriptor {
+                OperatorType::Neg => neg_eval_rule(self.child),
+                OperatorType::Add => add_eval_rule(self.child),
+                OperatorType::Sub => sub_eval_rule(self.child),
+                OperatorType::Mul => mul_eval_rule(self.child),
+                OperatorType::Div => div_eval_rule(self.child),
+                _ => self,
+            },
         }
     }
 }
@@ -43,7 +37,7 @@ impl NumAggregate for Expression {
 #[cfg(test)]
 mod eval_tests {
     use crate::{
-        ast::ast_node::Expression,
+        ast::tree::Expression,
         smart_num::{val_holder::IsClose, SmartNum, ToSmartNum},
     };
 

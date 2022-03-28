@@ -1,4 +1,4 @@
-use crate::ast::ast_node::Expression;
+use crate::ast::tree::Expression;
 use crate::compute::num_aggregate::NumAggregate;
 use crate::smart_num::ToSmartNum;
 

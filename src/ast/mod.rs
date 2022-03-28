@@ -1,2 +1,2 @@
-pub mod ast_node;
+pub mod tree;
 pub mod op;

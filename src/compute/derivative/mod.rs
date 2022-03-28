@@ -1,8 +1,11 @@
 mod rules;
 
 use crate::ast::{
-    ast_node::{AstNode, Expression},
-    op::{AstOperand, ToVariable},
+    op::{
+        operand::{AstOperand, ToVariable},
+        operator::OperatorType,
+    },
+    tree::{AstNode, Expression},
 };
 
 use self::rules::{
@@ -36,22 +39,14 @@ impl<T: ToVariable> Derivative<T> for Expression {
             },
             AstNode::Operator(operator) => {
                 let child = self.child;
-                if operator.descriptor == "Neg" {
-                    neg_derivative_rule(child, &variable)
-                } else if operator.descriptor == "Add" {
-                    add_derivative_rule(child, &variable)
-                } else if operator.descriptor == "Sub" {
-                    sub_derivative_rule(child, &variable)
-                } else if operator.descriptor == "Mul" {
-                    mul_derivative_rule(child, &variable)
-                } else if operator.descriptor == "Div" {
-                    div_derivative_rule(child, &variable)
-                } else if operator.descriptor == "Sin" {
-                    sin_derivative_rule(child, &variable)
-                } else if operator.descriptor == "Cos" {
-                    cos_derivative_rule(child, &variable)
-                } else {
-                    panic!("Derivative not Implemented for {}", operator.symbol);
+                match operator.descriptor {
+                    OperatorType::Neg => neg_derivative_rule(child, &variable),
+                    OperatorType::Add => add_derivative_rule(child, &variable),
+                    OperatorType::Sub => sub_derivative_rule(child, &variable),
+                    OperatorType::Mul => mul_derivative_rule(child, &variable),
+                    OperatorType::Div => div_derivative_rule(child, &variable),
+                    OperatorType::Sin => sin_derivative_rule(child, &variable),
+                    OperatorType::Cos => cos_derivative_rule(child, &variable),
                 }
             }
         }
@@ -62,7 +57,7 @@ impl<T: ToVariable> Derivative<T> for Expression {
 #[cfg(test)]
 mod derivative_tests {
     use crate::{
-        ast::ast_node::Expression,
+        ast::tree::Expression,
         compute::derivative::Derivative,
         math_op::{cos::cos, sin::sin},
     };

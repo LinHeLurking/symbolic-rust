@@ -4,27 +4,6 @@ use crate::smart_num::*;
 use std::{error::Error, fmt::Display};
 
 #[derive(Debug, Clone)]
-pub struct AstOperator {
-    pub symbol: String,
-    pub priority: u32,
-    pub(crate) descriptor: String,
-}
-
-impl PartialEq for AstOperator {
-    fn eq(&self, other: &Self) -> bool {
-        self.descriptor == other.descriptor
-    }
-}
-
-impl Eq for AstOperator {}
-
-impl Display for AstOperator {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.symbol)
-    }
-}
-
-#[derive(Debug, Clone)]
 pub struct Variable {
     pub name: String,
 }

@@ -1,15 +1,15 @@
 use std::ops::Neg;
 
 use crate::ast::{
-    ast_node::{AstNode, Expression},
-    op::AstOperator,
+    op::operator::{AstOperator, OperatorType},
+    tree::{AstNode, Expression},
 };
 
-fn gen_op_nge() -> AstOperator {
+fn gen_op_neg() -> AstOperator {
     AstOperator {
         symbol: "-".to_string(),
         priority: 1_u32,
-        descriptor: "Neg".to_string(),
+        descriptor: OperatorType::Neg,
     }
 }
 
@@ -18,7 +18,7 @@ impl Neg for Expression {
 
     fn neg(self) -> Self::Output {
         Expression {
-            root: AstNode::Operator(gen_op_nge()),
+            root: AstNode::Operator(gen_op_neg()),
             child: vec![self],
         }
     }

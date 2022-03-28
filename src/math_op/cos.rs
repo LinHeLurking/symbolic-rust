@@ -1,15 +1,15 @@
 #![allow(dead_code)]
 
 use crate::ast::{
-    ast_node::{AstNode, Expression},
-    op::AstOperator,
+    op::operator::{AstOperator, OperatorType},
+    tree::{AstNode, Expression},
 };
 
 fn gen_cos_op() -> AstOperator {
     AstOperator {
         symbol: "cos".to_string(),
         priority: 4,
-        descriptor: "Cos".to_string(),
+        descriptor: OperatorType::Cos,
     }
 }
 
@@ -47,7 +47,7 @@ pub fn cos<T: Into<Expression>>(x: T) -> Expression {
 
 #[cfg(test)]
 mod sin_tests {
-    use crate::ast::ast_node::Expression;
+    use crate::ast::tree::Expression;
 
     use super::cos;
 

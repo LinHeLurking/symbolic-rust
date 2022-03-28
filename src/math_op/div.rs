@@ -1,15 +1,15 @@
 use std::ops::Div;
 
 use crate::ast::{
-    ast_node::{AstNode, Expression},
-    op::AstOperator,
+    op::operator::{AstOperator, OperatorType},
+    tree::{AstNode, Expression},
 };
 
 fn gen_op_div() -> AstOperator {
     AstOperator {
         symbol: "/".to_string(),
         priority: 3_u32,
-        descriptor: "Div".to_string(),
+        descriptor: OperatorType::Div,
     }
 }
 
@@ -26,7 +26,7 @@ impl Div for Expression {
 
 #[cfg(test)]
 mod tests {
-    use crate::{ast::ast_node::Expression, compute::num_aggregate::NumAggregate};
+    use crate::{ast::tree::Expression, compute::num_aggregate::NumAggregate};
 
     #[test]
     fn div() {
