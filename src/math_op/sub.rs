@@ -1,12 +1,8 @@
 use std::ops::Sub;
 
-use crate::{
-    ast::{
-        ast_node::{AstNode, Expression},
-        op::AstOperator,
-    },
-    compute::num_aggregate::NumAggregate,
-    smart_num::ToSmartNum,
+use crate::ast::{
+    ast_node::{AstNode, Expression},
+    op::AstOperator,
 };
 
 fn gen_op_sub() -> AstOperator {
@@ -25,20 +21,6 @@ impl Sub for Expression {
             root: AstNode::Operator(gen_op_sub()),
             child: vec![self, rhs],
         }
-    }
-}
-
-pub(crate) fn sub_eval_rule(mut child: Vec<Expression>) -> Expression {
-    let r = child.pop().unwrap().num_aggregate();
-    let l = child.pop().unwrap().num_aggregate();
-    if l.is_num() && r.is_num() {
-        Expression::from(l.to_smart_num().unwrap() - r.to_smart_num().unwrap())
-    } else if l.is_zero() {
-        r
-    } else if r.is_zero() {
-        l
-    } else {
-        l - r
     }
 }
 

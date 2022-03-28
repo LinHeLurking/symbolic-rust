@@ -1,4 +1,4 @@
-pub(super) mod rules;
+mod rules;
 
 use crate::ast::{
     ast_node::{AstNode, Expression},

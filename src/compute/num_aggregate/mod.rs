@@ -1,9 +1,10 @@
-use crate::{
-    ast::ast_node::{AstNode, Expression},
-    math_op::{
-        add::add_eval_rule, div::div_eval_rule, mul::mul_eval_rule, neg::neg_eval_rule,
-        sub::sub_eval_rule,
-    },
+mod rules;
+
+use crate::ast::ast_node::{AstNode, Expression};
+
+use self::rules::{
+    add::add_eval_rule, div::div_eval_rule, mul::mul_eval_rule, neg::neg_eval_rule,
+    sub::sub_eval_rule,
 };
 
 pub trait NumAggregate {
@@ -12,8 +13,6 @@ pub trait NumAggregate {
     /// More complex operations like **sin()**, **exp()**
     /// will be left as it be.
     fn num_aggregate(self) -> Self;
-    /// Evaluate as many operations as possible.
-    fn full_num_aggregate(self) -> Self;
 }
 
 impl NumAggregate for Expression {
@@ -38,10 +37,6 @@ impl NumAggregate for Expression {
                 }
             }
         }
-    }
-
-    fn full_num_aggregate(self) -> Self {
-        todo!("Not implemented yet")
     }
 }
 

@@ -1,12 +1,8 @@
 use std::ops::Neg;
 
-use crate::{
-    ast::{
-        ast_node::{AstNode, Expression},
-        op::AstOperator,
-    },
-    compute::num_aggregate::NumAggregate,
-    smart_num::ToSmartNum,
+use crate::ast::{
+    ast_node::{AstNode, Expression},
+    op::AstOperator,
 };
 
 fn gen_op_nge() -> AstOperator {
@@ -25,15 +21,6 @@ impl Neg for Expression {
             root: AstNode::Operator(gen_op_nge()),
             child: vec![self],
         }
-    }
-}
-
-pub(crate) fn neg_eval_rule(mut child: Vec<Expression>) -> Expression {
-    let sub = child.pop().unwrap().num_aggregate();
-    if sub.is_num() {
-        Expression::from(-sub.to_smart_num().unwrap())
-    } else {
-        -sub
     }
 }
 
