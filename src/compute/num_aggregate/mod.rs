@@ -21,7 +21,7 @@ pub trait NumAggregate {
 impl NumAggregate for Expression {
     fn num_aggregate(self) -> Self {
         match &self.root {
-            AstNode::Operand(_) => self.clone(),
+            AstNode::Operand(_) => self,
             AstNode::Operator(operator) => match operator.descriptor {
                 OperatorType::Neg => neg_eval_rule(self.child),
                 OperatorType::Add => add_eval_rule(self.child),
