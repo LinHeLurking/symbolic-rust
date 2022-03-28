@@ -18,23 +18,23 @@ pub trait NumericEvaluate {
 
 impl NumericEvaluate for Expression {
     fn eval(self) -> Self {
-        match self.root {
+        match &self.root {
             AstNode::Operand(_) => self.clone(),
             AstNode::Operator(operator) => {
-                let child = self.child;
                 // TODO: auto query
                 if operator.descriptor == "Neg" {
-                    neg_eval_rule(child)
+                    neg_eval_rule(self.child)
                 } else if operator.descriptor == "Add" {
-                    add_eval_rule(child)
+                    add_eval_rule(self.child)
                 } else if operator.descriptor == "Sub" {
-                    sub_eval_rule(child)
+                    sub_eval_rule(self.child)
                 } else if operator.descriptor == "Mul" {
-                    mul_eval_rule(child)
+                    mul_eval_rule(self.child)
                 } else if operator.descriptor == "Div" {
-                    div_eval_rule(child)
+                    div_eval_rule(self.child)
                 } else {
-                    panic!("Aggregation not Implemented for {}", operator.symbol);
+                    // Not implemented evaluation
+                    self
                 }
             }
         }
@@ -49,7 +49,7 @@ impl NumericEvaluate for Expression {
 mod eval_tests {
     use crate::{
         ast::ast_node::Expression,
-        smart_num::{SmartNum, ToSmartNum, val_holder::IsClose},
+        smart_num::{val_holder::IsClose, SmartNum, ToSmartNum},
     };
 
     use super::NumericEvaluate;

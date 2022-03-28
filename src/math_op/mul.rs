@@ -1,9 +1,13 @@
 use std::ops::Mul;
 
-use crate::{ast::{
-    ast_node::{AstNode, Expression},
-    op::AstOperator,
-}, compute::evaluate::NumericEvaluate, smart_num::ToSmartNum};
+use crate::{
+    ast::{
+        ast_node::{AstNode, Expression},
+        op::{AstOperator, Variable},
+    },
+    compute::{derivative::Derivative, evaluate::NumericEvaluate},
+    smart_num::ToSmartNum,
+};
 
 fn gen_op_mul() -> AstOperator {
     AstOperator {
@@ -29,9 +33,24 @@ pub(crate) fn mul_eval_rule(mut child: Vec<Expression>) -> Expression {
     let l = child.pop().unwrap().eval();
     if l.is_num() && r.is_num() {
         Expression::from(l.to_smart_num().unwrap() * r.to_smart_num().unwrap())
+    } else if l.is_zero() || r.is_zero() {
+        Expression::from(0_i64)
+    } else if l.is_one() {
+        r
+    } else if r.is_one() {
+        l
     } else {
         l * r
     }
+}
+
+pub(crate) fn mul_derivative_rule(mut child: Vec<Expression>, to: &Variable) -> Expression {
+    // (uv)' = u'v + uv'
+    let v = child.pop().unwrap();
+    let u = child.pop().unwrap();
+    let v_d = v.clone().derivative(to);
+    let u_d = u.clone().derivative(to);
+    u_d * v + u * v_d
 }
 
 #[cfg(test)]

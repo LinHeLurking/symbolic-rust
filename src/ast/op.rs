@@ -37,6 +37,22 @@ impl Variable {
     }
 }
 
+pub(crate) trait ToVariable {
+    fn to_variable(self) -> Option<Variable>;
+}
+
+impl ToVariable for &Variable {
+    fn to_variable(self) -> Option<Variable> {
+        Some(self.clone())
+    }
+}
+
+impl ToVariable for Variable {
+    fn to_variable(self) -> Option<Variable> {
+        Some(self)
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum AstOperand {
     Num(SmartNum),
@@ -78,6 +94,34 @@ impl AstOperand {
         match self {
             AstOperand::Num(_) => true,
             AstOperand::Variable(_) => false,
+        }
+    }
+
+    pub fn is_one(&self) -> bool {
+        match self {
+            AstOperand::Variable(_) => false,
+            AstOperand::Num(num) => num.is_one(),
+        }
+    }
+
+    pub fn is_zero(&self) -> bool {
+        match self {
+            AstOperand::Variable(_) => false,
+            AstOperand::Num(num) => num.is_zero(),
+        }
+    }
+
+    pub fn is_pi(&self) -> bool {
+        match self {
+            AstOperand::Variable(_) => false,
+            AstOperand::Num(num) => num.is_pi(),
+        }
+    }
+
+    pub fn is_e(&self) -> bool {
+        match self {
+            AstOperand::Variable(_) => false,
+            AstOperand::Num(num) => num.is_e(),
         }
     }
 }

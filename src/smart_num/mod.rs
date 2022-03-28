@@ -7,7 +7,7 @@ use std::{
 };
 
 use self::{
-    special_const::SpecialConst,
+    special_const::ConstType,
     val_holder::{IsClose, SmartNumVal},
 };
 
@@ -19,7 +19,7 @@ pub mod val_holder;
 #[derive(Debug, Clone, Copy)]
 pub struct SmartNum {
     value: SmartNumVal,
-    tag: Option<SpecialConst>,
+    tag: ConstType,
 }
 
 pub trait ToSmartNum {
@@ -37,43 +37,63 @@ impl SmartNum {
     }
 
     pub fn new_rational(sign: i64, nominator: u64, denominator: u64) -> Option<SmartNum> {
-        SmartNumVal::new_rational(sign, nominator, denominator)
-            .and_then(|value| Some(SmartNum { value, tag: None }))
+        SmartNumVal::new_rational(sign, nominator, denominator).and_then(|value| {
+            Some(SmartNum {
+                value,
+                tag: ConstType::Nothing,
+            })
+        })
     }
 
     pub fn one() -> SmartNum {
         SmartNum {
             value: SmartNumVal::from(1_i64),
-            tag: Some(SpecialConst::One),
+            tag: ConstType::One,
         }
+    }
+
+    pub fn is_one(&self) -> bool {
+        self.tag == ConstType::One
     }
 
     pub fn zero() -> SmartNum {
         SmartNum {
             value: SmartNumVal::from(0_i64),
-            tag: Some(SpecialConst::Zero),
+            tag: ConstType::Zero,
         }
+    }
+
+    pub fn is_zero(&self) -> bool {
+        self.tag == ConstType::Zero
     }
 
     pub fn pi() -> SmartNum {
         SmartNum {
             value: SmartNumVal::from(PI),
-            tag: Some(SpecialConst::Pi),
+            tag: ConstType::Pi,
         }
+    }
+
+    pub fn is_pi(&self) -> bool {
+        self.tag == ConstType::Pi
     }
 
     pub fn e() -> SmartNum {
         SmartNum {
             value: SmartNumVal::from(E),
-            tag: Some(SpecialConst::E),
+            tag: ConstType::E,
         }
+    }
+
+    pub fn is_e(&self) -> bool {
+        self.tag == ConstType::E
     }
 }
 
 impl Display for SmartNum {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.tag.is_some() {
-            write!(f, "{}", self.tag.unwrap().to_string())
+        if self.tag != ConstType::Nothing {
+            write!(f, "{}", self.tag.to_string())
         } else {
             write!(f, "{}", self.value.to_string())
         }
@@ -98,7 +118,7 @@ where
 {
     fn from(v: T) -> Self {
         let value: SmartNumVal = v.into();
-        let tag = None;
+        let tag = gen_tag(&value);
         SmartNum { value, tag }
     }
 }
@@ -125,17 +145,17 @@ impl Neg for &SmartNum {
     }
 }
 
-fn gen_tag(value: &SmartNumVal) -> Option<SpecialConst> {
+fn gen_tag(value: &SmartNumVal) -> ConstType {
     if !value.is_int() {
-        None
+        ConstType::Nothing
     } else {
         let i = value.to_i64().unwrap();
         if i == 0 {
-            Some(SpecialConst::Zero)
+            ConstType::Zero
         } else if i == 1 {
-            Some(SpecialConst::One)
+            ConstType::One
         } else {
-            None
+            ConstType::Nothing
         }
     }
 }

@@ -4,3 +4,4 @@ pub mod sub;
 pub mod mul;
 pub mod div;
 pub mod sin;
+pub mod cos;

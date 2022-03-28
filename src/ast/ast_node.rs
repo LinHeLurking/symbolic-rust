@@ -101,6 +101,34 @@ impl Expression {
             child: vec![],
         }
     }
+
+    pub fn is_one(&self) -> bool {
+        match &self.root {
+            AstNode::Operator(_) => false,
+            AstNode::Operand(operand) => operand.is_one(),
+        }
+    }
+
+    pub fn is_zero(&self) -> bool {
+        match &self.root {
+            AstNode::Operator(_) => false,
+            AstNode::Operand(operand) => operand.is_zero(),
+        }
+    }
+
+    pub fn is_pi(&self) -> bool {
+        match &self.root {
+            AstNode::Operator(_) => false,
+            AstNode::Operand(operand) => operand.is_pi(),
+        }
+    }
+
+    pub fn is_e(&self) -> bool {
+        match &self.root {
+            AstNode::Operator(_) => false,
+            AstNode::Operand(operand) => operand.is_e(),
+        }
+    }
 }
 
 impl Display for Expression {
@@ -141,6 +169,30 @@ where
         Expression {
             root: AstNode::from(v),
             child: vec![],
+        }
+    }
+}
+
+impl ToVariable for &Expression {
+    fn to_variable(self) -> Option<Variable> {
+        match &self.root {
+            AstNode::Operator(_) => None,
+            AstNode::Operand(operand) => match operand {
+                AstOperand::Num(_) => None,
+                AstOperand::Variable(variable) => Some(variable.clone()),
+            },
+        }
+    }
+}
+
+impl ToVariable for Expression {
+    fn to_variable(self) -> Option<Variable> {
+        match self.root {
+            AstNode::Operator(_) => None,
+            AstNode::Operand(operand) => match operand {
+                AstOperand::Num(_) => None,
+                AstOperand::Variable(variable) => Some(variable),
+            },
         }
     }
 }

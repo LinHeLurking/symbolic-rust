@@ -3,9 +3,10 @@ use std::ops::Add;
 use crate::{
     ast::{
         ast_node::{AstNode, Expression},
-        op::AstOperator,
+        op::{AstOperator, Variable},
     },
-    compute::evaluate::NumericEvaluate, smart_num::ToSmartNum,
+    compute::{derivative::Derivative, evaluate::NumericEvaluate},
+    smart_num::ToSmartNum,
 };
 
 fn gen_op_add() -> AstOperator {
@@ -32,9 +33,19 @@ pub(crate) fn add_eval_rule(mut child: Vec<Expression>) -> Expression {
     let l = child.pop().unwrap().eval();
     if l.is_num() && r.is_num() {
         Expression::from(l.to_smart_num().unwrap() + r.to_smart_num().unwrap())
+    } else if l.is_zero() {
+        r
+    } else if r.is_zero() {
+        l
     } else {
         l + r
     }
+}
+
+pub(crate) fn add_derivative_rule(mut child: Vec<Expression>, to: &Variable) -> Expression {
+    let r = child.pop().unwrap().derivative(to);
+    let l = child.pop().unwrap().derivative(to);
+    l + r
 }
 
 #[cfg(test)]

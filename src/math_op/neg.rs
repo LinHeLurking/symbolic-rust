@@ -3,9 +3,10 @@ use std::ops::Neg;
 use crate::{
     ast::{
         ast_node::{AstNode, Expression},
-        op::AstOperator,
+        op::{AstOperator, Variable},
     },
-    compute::evaluate::NumericEvaluate, smart_num::ToSmartNum,
+    compute::{derivative::Derivative, evaluate::NumericEvaluate},
+    smart_num::ToSmartNum,
 };
 
 fn gen_op_nge() -> AstOperator {
@@ -34,6 +35,11 @@ pub(crate) fn neg_eval_rule(mut child: Vec<Expression>) -> Expression {
     } else {
         -sub
     }
+}
+
+pub(crate) fn neg_derivative_rule(mut child: Vec<Expression>, to: &Variable) -> Expression {
+    let sub = child.pop().unwrap().derivative(to);
+    -sub
 }
 
 #[cfg(test)]
