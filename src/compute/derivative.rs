@@ -10,7 +10,7 @@ use crate::{
     },
 };
 
-use super::evaluate::NumericEvaluate;
+use super::num_aggregate::NumAggregate;
 
 pub(crate) trait Derivative<T: ToVariable> {
     type Output;
@@ -54,7 +54,7 @@ impl<T: ToVariable> Derivative<T> for Expression {
                 }
             }
         }
-        .eval()
+        .num_aggregate()
     }
 }
 

@@ -5,7 +5,7 @@ use crate::{
         ast_node::{AstNode, Expression},
         op::{AstOperator, Variable},
     },
-    compute::{derivative::Derivative, evaluate::NumericEvaluate},
+    compute::{derivative::Derivative, num_aggregate::NumAggregate},
     smart_num::ToSmartNum,
 };
 
@@ -29,7 +29,7 @@ impl Neg for Expression {
 }
 
 pub(crate) fn neg_eval_rule(mut child: Vec<Expression>) -> Expression {
-    let sub = child.pop().unwrap().eval();
+    let sub = child.pop().unwrap().num_aggregate();
     if sub.is_num() {
         Expression::from(-sub.to_smart_num().unwrap())
     } else {
@@ -45,13 +45,13 @@ pub(crate) fn neg_derivative_rule(mut child: Vec<Expression>, to: &Variable) -> 
 #[cfg(test)]
 mod test {
     use super::Expression;
-    use crate::{compute::evaluate::NumericEvaluate, smart_num::ToSmartNum};
+    use crate::{compute::num_aggregate::NumAggregate, smart_num::ToSmartNum};
 
     #[test]
     fn neg() {
         let x = Expression::from(1_i32);
         let y = Expression::from(-1_i32);
-        let z = (-y).eval();
+        let z = (-y).num_aggregate();
         assert_eq!(
             x.to_smart_num().unwrap().to_i64(),
             z.to_smart_num().unwrap().to_i64()

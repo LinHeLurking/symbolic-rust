@@ -6,18 +6,18 @@ use crate::{
     },
 };
 
-pub trait NumericEvaluate {
+pub trait NumAggregate {
     /// Evaluate and aggregate numbers in expression.
     /// Only arithmetic operations are evaluated.
     /// More complex operations like **sin()**, **exp()**
     /// will be left as it be.
-    fn eval(self) -> Self;
+    fn num_aggregate(self) -> Self;
     /// Evaluate as many operations as possible.
-    fn full_eval(self) -> Self;
+    fn full_num_aggregate(self) -> Self;
 }
 
-impl NumericEvaluate for Expression {
-    fn eval(self) -> Self {
+impl NumAggregate for Expression {
+    fn num_aggregate(self) -> Self {
         match &self.root {
             AstNode::Operand(_) => self.clone(),
             AstNode::Operator(operator) => {
@@ -40,7 +40,7 @@ impl NumericEvaluate for Expression {
         }
     }
 
-    fn full_eval(self) -> Self {
+    fn full_num_aggregate(self) -> Self {
         todo!("Not implemented yet")
     }
 }
@@ -52,7 +52,7 @@ mod eval_tests {
         smart_num::{val_holder::IsClose, SmartNum, ToSmartNum},
     };
 
-    use super::NumericEvaluate;
+    use super::NumAggregate;
 
     #[test]
     fn eval() {
@@ -62,7 +62,7 @@ mod eval_tests {
         let d = Expression::from(4_u32);
         let e = Expression::from(5_u32);
         let x = -(a + b) * (c - d) / e; // -(1+2)*(3-4)/5 == 3/5
-        let ans = x.eval().to_smart_num().unwrap();
+        let ans = x.num_aggregate().to_smart_num().unwrap();
         let expected = SmartNum::new_rational(1, 3, 5).unwrap();
         assert!(ans.is_close(expected, 1e-9));
     }
