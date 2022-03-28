@@ -7,6 +7,8 @@ pub(crate) fn div_eval_rule(mut child: Vec<Expression>) -> Expression {
     let l = child.pop().unwrap().num_aggregate();
     if l.is_num() && r.is_num() {
         Expression::from(l.to_smart_num().unwrap() / r.to_smart_num().unwrap())
+    } else if l.is_zero() {
+        Expression::from(0_i64)
     } else {
         l / r
     }
