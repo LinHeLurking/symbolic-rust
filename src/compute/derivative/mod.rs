@@ -1,6 +1,6 @@
 mod rules;
 
-use std::{error::Error, fmt::Display};
+use std::{borrow::Borrow, error::Error, fmt::Display};
 
 use crate::ast::{
     op::{
@@ -24,29 +24,26 @@ pub(crate) trait Derivative<'a, T> {
 }
 
 #[derive(Debug)]
-pub struct DerivativeError {}
-
-impl Error for DerivativeError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        None
-    }
+pub struct DerivativeError<T> {
+    err_src: T,
 }
 
-impl Display for DerivativeError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Cannot be used as a variable")
-    }
-}
-
-impl<'a, T: 'a> Derivative<'a, T> for Expression
+impl<T> Display for DerivativeError<T>
 where
-    T: ToString + Display,
-    Option<&'a Variable>: From<T>,
+    T: Display,
 {
-    type Output = Result<Expression, DerivativeError>;
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} cannot be used as a variable", self.err_src)
+    }
+}
 
-    fn derivative(self, to_: T) -> Self::Output {
-        let to = Into::<Option<&Variable>>::into(to_).ok_or(DerivativeError {})?;
+impl<'a> Derivative<'a, &Variable> for Expression {
+    type Output = Result<Expression, DerivativeError<Expression>>;
+
+    fn derivative(self, to_: &Variable) -> Self::Output {
+        let to = Into::<Option<&Variable>>::into(to_).ok_or(DerivativeError {
+            err_src: Expression::from(to_.clone()),
+        })?;
         let result = match self.root {
             AstNode::Operand(operand) => match operand {
                 AstOperand::Num(_) => Expression::from(0_i64),
@@ -76,6 +73,28 @@ where
     }
 }
 
+impl<'a> Derivative<'a, &Expression> for Expression {
+    type Output = Result<Expression, DerivativeError<Expression>>;
+
+    fn derivative(self, to: &Expression) -> Self::Output {
+        let variable = Into::<Option<&Variable>>::into(to).ok_or(DerivativeError {
+            err_src: to.clone(),
+        })?;
+        return self.derivative(variable);
+    }
+}
+
+impl<'a> Derivative<'a, Expression> for Expression {
+    type Output = Result<Expression, DerivativeError<Expression>>;
+
+    fn derivative(self, to: Expression) -> Self::Output {
+        let variable = Into::<Option<&Variable>>::into(&to).ok_or(DerivativeError {
+            err_src: to.clone(),
+        })?;
+        return self.derivative(variable);
+    }
+}
+
 #[cfg(test)]
 mod derivative_tests {
     use crate::{
@@ -92,7 +111,7 @@ mod derivative_tests {
             let sin_x = sin(x.clone());
             let cos_u = cos(u.clone());
             let y = sin_x * cos_u;
-            let y_d_x = y.derivative(&x).unwrap();
+            let y_d_x = y.derivative(x).unwrap();
             println!("{}", y_d_x);
             assert_eq!(y_d_x.to_string(), "cosx * cosu");
         }
@@ -103,7 +122,7 @@ mod derivative_tests {
                 let sin_x = sin(x.clone());
                 let cos_u = cos(u.clone());
                 let y = sin_x * cos_u;
-                let y_d_u = y.derivative(&u).unwrap();
+                let y_d_u = y.derivative(u).unwrap();
                 println!("{}", y_d_u);
                 assert_eq!(y_d_u.to_string(), "sinx * (-sinu)");
             }
@@ -111,7 +130,7 @@ mod derivative_tests {
         {
             let x = Expression::new_variable("x");
             let y = sin(x.clone()) * sin(x.clone()) * x.clone();
-            println!("{}", y.derivative(&x).unwrap());
+            println!("{}", y.derivative(x).unwrap());
         }
     }
 }

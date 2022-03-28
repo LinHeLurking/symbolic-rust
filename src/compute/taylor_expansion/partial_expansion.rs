@@ -1,35 +1,43 @@
-// #![allow(dead_code)]
+#![allow(dead_code)]
 
-// use crate::{
-//     ast::{op::operand::Variable, tree::Expression},
-//     compute::derivative::Derivative,
-//     smart_num::SmartNum,
-// };
+use std::{error::Error, fmt::Display};
 
-// pub struct PartialExpansion {
-//     order: u32,
-//     coefficient: Vec<SmartNum>,
-//     residual: Expression,
-// }
+use crate::{
+    ast::{op::operand::Variable, tree::Expression},
+    compute::derivative::{Derivative, DerivativeError},
+    smart_num::SmartNum,
+};
 
-// trait TaylorExpansion<U, T>
-// where
-//     U: Into<Option<Variable>>,
-//     T: Into<Expression>,
-// {
-//     type Output;
-//     fn taylor_expansion(self, of: U, at: &T) -> Self::Output;
-// }
+pub struct PartialExpansion {
+    order: u32,
+    coefficient: Vec<SmartNum>,
+    residual: Expression,
+}
 
-// impl<'a, T> Derivative<T> for &'a mut PartialExpansion
-// where
-//     T: Into<Option<Variable>>,
-// {
-//     type Output = &'a mut PartialExpansion;
+trait TaylorExpansion<'a, T, U> {
+    type Output;
+    fn taylor_expansion(self, of: U, at: &T) -> Self::Output;
+}
 
-//     fn derivative(self, to: T) -> Self::Output {
-//         let to_ = Into::<Option<Variable>>::into(to).unwrap();
-//         self.order+=1;
-//         // self.coefficient.push(self.)
-//     }
-// }
+#[derive(Debug)]
+struct TaylorExpansionError<'a> {
+    source: Option<&'a dyn Error>,
+}
+
+impl Display for TaylorExpansionError<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", "Expansion error")
+    }
+}
+
+impl<'a, T, U> TaylorExpansion<'a, T, U> for Expression
+where
+    U: Into<Option<&'a Variable>>,
+    T: Into<Expression>,
+{
+    type Output = Result<PartialExpansion, TaylorExpansionError<'a>>;
+
+    fn taylor_expansion(self, of: U, at: &T) -> Self::Output {
+        todo!()
+    }
+}

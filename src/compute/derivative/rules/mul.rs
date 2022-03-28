@@ -6,7 +6,7 @@ use crate::{
 pub(crate) fn mul_derivative_rule(
     mut child: Vec<Expression>,
     to: &Variable,
-) -> Result<Expression, DerivativeError> {
+) -> Result<Expression, DerivativeError<Expression>> {
     // (uv)' = u'v + uv'
     let v = child.pop().unwrap();
     let u = child.pop().unwrap();

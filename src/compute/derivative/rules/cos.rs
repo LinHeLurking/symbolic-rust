@@ -7,7 +7,7 @@ use crate::{
 pub(crate) fn cos_derivative_rule(
     mut child: Vec<Expression>,
     to: &Variable,
-) -> Result<Expression, DerivativeError> {
+) -> Result<Expression, DerivativeError<Expression>> {
     // (cos(u))' = -sin(u)*u'
     let sub = child.pop().unwrap();
     return Ok(-sin(sub.clone()) * sub.derivative(to)?);

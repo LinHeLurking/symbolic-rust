@@ -6,7 +6,7 @@ use crate::{
 pub(crate) fn neg_derivative_rule(
     mut child: Vec<Expression>,
     to: &Variable,
-) -> Result<Expression, DerivativeError> {
+) -> Result<Expression, DerivativeError<Expression>> {
     let sub = child.pop().unwrap().derivative(to)?;
     return Ok(-sub);
 }

@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use super::op::{
-    operand::{ AstOperand, Variable},
+    operand::{AstOperand, Variable},
     operator::AstOperator,
 };
 use crate::smart_num::{SmartNum, ToSmartNum};
@@ -182,6 +182,12 @@ impl<'a> From<&'a Expression> for Option<&'a Variable> {
             AstNode::Operator(_) => None,
             AstNode::Operand(operand) => operand.into(),
         }
+    }
+}
+
+impl From<Variable> for Expression {
+    fn from(v: Variable) -> Self {
+        Expression::new_variable(v.name.as_str())
     }
 }
 
