@@ -5,3 +5,5 @@ pub mod mul;
 pub mod div;
 pub mod sin;
 pub mod cos;
+pub mod exp;
+pub mod ln;

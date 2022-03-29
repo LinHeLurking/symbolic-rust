@@ -7,11 +7,12 @@ use std::{
 };
 
 use self::{
+    rational::{RationalNum, ToRational},
     special_const::ConstType,
     val_holder::{IsClose, SmartNumVal},
 };
 
-mod rational;
+pub mod rational;
 mod special_const;
 mod tests;
 pub(super) mod val_holder;
@@ -93,6 +94,26 @@ impl SmartNum {
 
     pub fn is_e(&self) -> bool {
         self.tag == ConstType::E
+    }
+}
+
+impl ToRational for SmartNum {
+    type Output = Option<RationalNum>;
+
+    fn to_rational(self) -> Self::Output {
+        match self.value {
+            SmartNumVal::Integer(v) => Some(RationalNum::from(v)),
+            SmartNumVal::Rational(v) => Some(v),
+            SmartNumVal::Real(_) => None,
+        }
+    }
+}
+
+impl<'a> ToRational for &'a SmartNum {
+    type Output = Option<RationalNum>;
+
+    fn to_rational(self) -> Self::Output {
+        self.clone().to_rational()
     }
 }
 

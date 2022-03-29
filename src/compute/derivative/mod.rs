@@ -1,6 +1,6 @@
 mod rules;
 
-use std::fmt::Display;
+use std::{fmt::Display, panic};
 
 use crate::ast::{
     op::{
@@ -65,6 +65,7 @@ impl<'a> Derivative<'a, &Variable> for Expression {
                     OperatorType::Div => div_derivative_rule(child, to)?,
                     OperatorType::Sin => sin_derivative_rule(child, to)?,
                     OperatorType::Cos => cos_derivative_rule(child, to)?,
+                    _ => panic!(),
                 }
             }
         }
@@ -105,6 +106,13 @@ mod derivative_tests {
 
     #[test]
     fn d() {
+        {
+            let x = Expression::new_variable("x");
+            let y = sin(x.clone());
+            let y_d_x = y.derivative(x).unwrap();
+            println!("{}", y_d_x);
+            assert_eq!(y_d_x.to_string(), "cosx");
+        }
         {
             let x = Expression::new_variable("x");
             let u = Expression::new_variable("u");

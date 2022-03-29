@@ -10,6 +10,11 @@ pub struct RationalNum {
     pub denominator: u64,
 }
 
+pub trait ToRational {
+    type Output;
+    fn to_rational(self) -> Self::Output;
+}
+
 impl Display for RationalNum {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let sign_symbol = if self.sign == 1 { "" } else { "-" };
@@ -168,7 +173,7 @@ impl From<u64> for RationalNum {
 impl From<i64> for RationalNum {
     fn from(v: i64) -> Self {
         RationalNum {
-            sign: v.signum(),
+            sign: if v == 0 { 1_i64 } else { v.signum() },
             nominator: v.abs() as u64,
             denominator: 1,
         }

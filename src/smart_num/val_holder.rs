@@ -5,7 +5,7 @@ use std::{
     ops::{Add, Div, Mul, Neg, Sub},
 };
 
-use super::rational::RationalNum;
+use super::rational::{RationalNum, ToRational};
 
 #[derive(Debug, Clone, Copy)]
 pub(super) enum SmartNumVal {
@@ -110,6 +110,30 @@ impl IsClose<SmartNumVal> for SmartNumVal {
 impl IsClose<&SmartNumVal> for &SmartNumVal {
     fn is_close(self, rhs: &SmartNumVal, eps: f64) -> bool {
         return (self.to_f64() - rhs.to_f64()).abs() < eps;
+    }
+}
+
+impl ToRational for SmartNumVal {
+    type Output = Option<RationalNum>;
+
+    fn to_rational(self) -> Self::Output {
+        match self {
+            SmartNumVal::Integer(_) => None,
+            SmartNumVal::Rational(v) => Some(v),
+            SmartNumVal::Real(_) => None,
+        }
+    }
+}
+
+impl<'a> ToRational for &'a SmartNumVal {
+    type Output = Option<&'a RationalNum>;
+
+    fn to_rational(self) -> Self::Output {
+        match self {
+            SmartNumVal::Integer(_) => None,
+            SmartNumVal::Rational(v) => Some(v),
+            SmartNumVal::Real(_) => None,
+        }
     }
 }
 

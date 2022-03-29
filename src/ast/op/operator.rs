@@ -11,6 +11,8 @@ pub enum OperatorType {
     Div,
     Sin,
     Cos,
+    Exp,
+    Ln,
 }
 
 #[derive(Debug, Clone)]

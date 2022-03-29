@@ -4,8 +4,11 @@ use super::op::{
     operand::{AstOperand, Variable},
     operator::AstOperator,
 };
-use crate::smart_num::{SmartNum, ToSmartNum};
-use std::{error::Error, fmt::Display};
+use crate::smart_num::{
+    rational::{RationalNum, ToRational},
+    SmartNum, ToSmartNum,
+};
+use std::{error::Error, fmt::Display, vec};
 
 #[derive(Debug, Clone)]
 pub enum AstNode {
@@ -112,11 +115,19 @@ impl Expression {
         }
     }
 
+    pub fn one() -> Expression {
+        Expression::from(1_i64)
+    }
+
     pub fn is_zero(&self) -> bool {
         match &self.root {
             AstNode::Operator(_) => false,
             AstNode::Operand(operand) => operand.is_zero(),
         }
+    }
+
+    pub fn zero() -> Expression {
+        Expression::from(0_i64)
     }
 
     pub fn is_pi(&self) -> bool {
@@ -126,11 +137,19 @@ impl Expression {
         }
     }
 
+    pub fn pi() -> Expression {
+        Expression::from(SmartNum::pi())
+    }
+
     pub fn is_e(&self) -> bool {
         match &self.root {
             AstNode::Operator(_) => false,
             AstNode::Operand(operand) => operand.is_e(),
         }
+    }
+
+    pub fn e() -> Expression {
+        Expression::from(SmartNum::e())
     }
 }
 
@@ -160,6 +179,34 @@ impl<'a> ToSmartNum for &'a Expression {
             AstNode::Operand(operand) => operand
                 .to_smart_num()
                 .map_err(|e| ExprIsNotNumError { source_: Some(e) }),
+        }
+    }
+}
+
+impl ToRational for Expression {
+    type Output = Option<RationalNum>;
+
+    fn to_rational(self) -> Self::Output {
+        match self.root {
+            AstNode::Operator(_) => None,
+            AstNode::Operand(operand) => match operand {
+                AstOperand::Num(v) => v.to_rational(),
+                AstOperand::Variable(_) => None,
+            },
+        }
+    }
+}
+
+impl ToRational for &Expression {
+    type Output = Option<RationalNum>;
+
+    fn to_rational(self) -> Self::Output {
+        match &self.root {
+            AstNode::Operator(_) => None,
+            AstNode::Operand(operand) => match operand {
+                AstOperand::Num(v) => v.to_rational(),
+                AstOperand::Variable(_) => None,
+            },
         }
     }
 }
@@ -197,6 +244,15 @@ impl From<Expression> for Option<Variable> {
 impl From<Variable> for Expression {
     fn from(v: Variable) -> Self {
         Expression::new_variable(v.name.as_str())
+    }
+}
+
+impl From<AstOperand> for Expression {
+    fn from(operand: AstOperand) -> Self {
+        Expression {
+            root: AstNode::Operand(operand),
+            child: vec![],
+        }
     }
 }
 
