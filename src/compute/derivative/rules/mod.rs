@@ -5,3 +5,5 @@ pub(crate) mod mul;
 pub(crate) mod div;
 pub(crate) mod sin;
 pub(crate) mod cos;
+pub(crate) mod exp;
+pub(crate) mod ln;
