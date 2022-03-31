@@ -12,6 +12,7 @@ use crate::{
 pub struct PartialExpansion {
     order: u32,
     of: Expression,
+    at: Expression,
     coefficient: Vec<Expression>,
     residual: Expression,
 }
@@ -24,21 +25,28 @@ impl Display for PartialExpansion {
                 continue;
             }
             content.push_str(format!("{} * ", term).as_str());
-            content.push_str(format!("{}^{}", self.of, idx).as_str());
+            content.push_str(format!("{}^{}", self.of.clone() - self.at.clone(), idx).as_str());
             content.push_str(" + ")
         }
-        content.push_str(format!("O({}^{})", self.of, self.order + 1).as_str());
+        content.push_str(
+            format!(
+                "O({}^{})",
+                self.of.clone() - self.at.clone(),
+                self.order + 1
+            )
+            .as_str(),
+        );
         write!(f, "{}", content)
     }
 }
 
-trait TaylorExpansion<'a, T, U> {
+pub trait TaylorExpansion<'a, T, U> {
     type Output;
     fn taylor_expansion(self, of: T, at: U, order: u32) -> Self::Output;
 }
 
 #[derive(Debug)]
-struct TaylorExpansionError<T = Expression> {
+pub struct TaylorExpansionError<T = Expression> {
     err_expr: T,
     reason: &'static str,
 }
@@ -81,6 +89,7 @@ impl<'a> TaylorExpansion<'a, &Variable, &Expression> for Expression {
         return Ok(PartialExpansion {
             order,
             of: Expression::from(of.clone()),
+            at: Expression::from(at.clone()),
             coefficient,
             residual,
         });

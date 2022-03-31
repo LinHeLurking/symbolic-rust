@@ -1,1 +1,1 @@
-mod partial_expansion;
+pub mod partial_expansion;
