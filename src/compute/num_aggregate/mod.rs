@@ -7,8 +7,8 @@ use crate::ast::{
 
 use self::rules::{
     add::add_eval_rule, cos::cos_eval_rule, div::div_eval_rule, exp::exp_eval_rule,
-    ln::ln_eval_rule, mul::mul_eval_rule, neg::neg_eval_rule, sin::sin_eval_rule,
-    sub::sub_eval_rule,
+    ln::ln_eval_rule, mul::mul_eval_rule, neg::neg_eval_rule, pow::pow_eval_rule,
+    sin::sin_eval_rule, sub::sub_eval_rule,
 };
 
 pub trait NumAggregate {
@@ -33,6 +33,7 @@ impl NumAggregate for Expression {
                 OperatorType::Cos => cos_eval_rule(self.child),
                 OperatorType::Exp => exp_eval_rule(self.child),
                 OperatorType::Ln => ln_eval_rule(self.child),
+                OperatorType::Pow => pow_eval_rule(self.child),
             },
         }
     }

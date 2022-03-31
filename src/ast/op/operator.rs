@@ -13,6 +13,7 @@ pub enum OperatorType {
     Cos,
     Exp,
     Ln,
+    Pow,
 }
 
 #[derive(Debug, Clone)]

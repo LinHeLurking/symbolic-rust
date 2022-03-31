@@ -13,7 +13,8 @@ use crate::ast::{
 use self::rules::{
     add::add_derivative_rule, cos::cos_derivative_rule, div::div_derivative_rule,
     exp::exp_derivative_rule, ln::ln_derivative_rule, mul::mul_derivative_rule,
-    neg::neg_derivative_rule, sin::sin_derivative_rule, sub::sub_derivative_rule,
+    neg::neg_derivative_rule, pow::pow_derivative_rule, sin::sin_derivative_rule,
+    sub::sub_derivative_rule,
 };
 
 use super::num_aggregate::NumAggregate;
@@ -67,6 +68,7 @@ impl<'a> Derivative<'a, &Variable> for Expression {
                     OperatorType::Cos => cos_derivative_rule(child, to)?,
                     OperatorType::Exp => exp_derivative_rule(child, to)?,
                     OperatorType::Ln => ln_derivative_rule(child, to)?,
+                    OperatorType::Pow => pow_derivative_rule(child, to)?,
                 }
             }
         }
@@ -102,7 +104,7 @@ mod derivative_tests {
     use crate::{
         ast::tree::Expression,
         compute::derivative::Derivative,
-        math_op::{cos::cos, exp::exp, sin::sin, ln::ln},
+        math_op::{cos::cos, exp::exp, ln::ln, sin::sin},
     };
 
     #[test]

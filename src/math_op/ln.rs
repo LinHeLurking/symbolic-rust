@@ -8,7 +8,7 @@ use crate::ast::{
 fn gen_op_ln() -> AstOperator {
     AstOperator {
         symbol: "ln".to_string(),
-        priority: 4_u32,
+        priority: 5_u32,
         descriptor: OperatorType::Ln,
     }
 }

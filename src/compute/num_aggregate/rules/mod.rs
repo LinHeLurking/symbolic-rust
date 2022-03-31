@@ -7,3 +7,4 @@ pub(crate) mod sin;
 pub(crate) mod cos;
 pub(crate) mod exp;
 pub(crate) mod ln;
+pub(crate) mod pow;

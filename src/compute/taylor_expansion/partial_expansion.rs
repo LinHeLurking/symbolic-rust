@@ -5,6 +5,7 @@ use std::{fmt::Display, vec};
 use crate::{
     ast::{op::operand::Variable, tree::Expression},
     compute::{derivative::Derivative, num_aggregate::NumAggregate, substitute::Substitute},
+    math_op::pow::Pow,
     smart_num::SmartNum,
 };
 
@@ -20,22 +21,16 @@ pub struct PartialExpansion {
 impl Display for PartialExpansion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut content = String::from("");
+        let b = (self.of.clone() - self.at.clone()).num_aggregate();
         for (idx, term) in self.coefficient.iter().enumerate() {
             if term.is_zero() {
                 continue;
             }
             content.push_str(format!("{} * ", term).as_str());
-            content.push_str(format!("{}^{}", self.of.clone() - self.at.clone(), idx).as_str());
+            content.push_str(format!("{}", b.clone().pow(idx as i64)).as_str());
             content.push_str(" + ")
         }
-        content.push_str(
-            format!(
-                "O({}^{})",
-                self.of.clone() - self.at.clone(),
-                self.order + 1
-            )
-            .as_str(),
-        );
+        content.push_str(format!("O({})", b.clone().pow(self.order + 1),).as_str());
         write!(f, "{}", content)
     }
 }

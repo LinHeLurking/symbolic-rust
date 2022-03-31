@@ -8,7 +8,7 @@ use crate::ast::{
 fn gen_sin_op() -> AstOperator {
     AstOperator {
         symbol: "sin".to_string(),
-        priority: 4,
+        priority: 5,
         descriptor: OperatorType::Sin,
     }
 }

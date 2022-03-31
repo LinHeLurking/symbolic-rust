@@ -8,7 +8,7 @@ use crate::ast::{
 fn gen_cos_op() -> AstOperator {
     AstOperator {
         symbol: "cos".to_string(),
-        priority: 4,
+        priority: 5,
         descriptor: OperatorType::Cos,
     }
 }

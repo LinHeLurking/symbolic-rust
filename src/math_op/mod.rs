@@ -7,3 +7,4 @@ pub mod sin;
 pub mod cos;
 pub mod exp;
 pub mod ln;
+pub mod pow;
