@@ -95,6 +95,14 @@ impl SmartNum {
     pub fn is_e(&self) -> bool {
         self.tag == ConstType::E
     }
+
+    pub fn sign(&self) -> i64 {
+        match self.value {
+            SmartNumVal::Integer(v) => v.signum(),
+            SmartNumVal::Rational(v) => v.sign,
+            SmartNumVal::Real(v) => v.signum() as i64,
+        }
+    }
 }
 
 impl ToRational for SmartNum {

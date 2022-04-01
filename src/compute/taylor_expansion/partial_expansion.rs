@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use std::{fmt::Display, vec};
+use std::{collections::VecDeque, fmt::Display};
 
 use crate::{
     ast::{op::operand::Variable, tree::Expression},
@@ -11,11 +11,11 @@ use crate::{
 
 #[derive(Debug, Clone)]
 pub struct PartialExpansion {
-    order: u32,
-    of: Expression,
-    at: Expression,
-    coefficient: Vec<Expression>,
-    residual: Expression,
+    pub order: u64,
+    pub of: Expression,
+    pub at: Expression,
+    pub coefficient: VecDeque<Expression>,
+    pub residual: Expression,
 }
 
 impl Display for PartialExpansion {
@@ -37,7 +37,7 @@ impl Display for PartialExpansion {
 
 pub trait TaylorExpansion<'a, T, U> {
     type Output;
-    fn taylor_expansion(self, of: T, at: U, order: u32) -> Self::Output;
+    fn taylor_expansion(self, of: T, at: U, order: u64) -> Self::Output;
 }
 
 #[derive(Debug)]
@@ -58,13 +58,13 @@ where
 impl<'a> TaylorExpansion<'a, &Variable, &Expression> for Expression {
     type Output = Result<PartialExpansion, TaylorExpansionError<Expression>>;
 
-    fn taylor_expansion(self, of: &Variable, at: &Expression, order: u32) -> Self::Output {
-        let mut coefficient: Vec<Expression> = vec![];
+    fn taylor_expansion(self, of: &Variable, at: &Expression, order: u64) -> Self::Output {
+        let mut coefficient: VecDeque<Expression> = VecDeque::new();
         let mut residual = self;
         let mut factorial = SmartNum::from(1_i64);
         let err_expr = residual.clone();
         for k in 0..=order {
-            factorial = factorial * SmartNum::from(k.max(1_u32));
+            factorial = factorial * SmartNum::from(k.max(1_u64));
             let cur = residual
                 .clone()
                 .substitute(of, at)
@@ -74,7 +74,7 @@ impl<'a> TaylorExpansion<'a, &Variable, &Expression> for Expression {
                 })?
                 .num_aggregate()
                 / Expression::from(factorial);
-            coefficient.push(cur.num_aggregate());
+            coefficient.push_back(cur.num_aggregate());
 
             residual = residual.derivative(of).map_err(|_| TaylorExpansionError {
                 err_expr: err_expr.clone(),
@@ -94,7 +94,7 @@ impl<'a> TaylorExpansion<'a, &Variable, &Expression> for Expression {
 impl<'a> TaylorExpansion<'a, Expression, Expression> for Expression {
     type Output = Result<PartialExpansion, TaylorExpansionError<Expression>>;
 
-    fn taylor_expansion(self, of: Expression, at: Expression, order: u32) -> Self::Output {
+    fn taylor_expansion(self, of: Expression, at: Expression, order: u64) -> Self::Output {
         let of_raw = Into::<Option<Variable>>::into(of.clone());
         if of_raw.is_none() {
             return Err(TaylorExpansionError {

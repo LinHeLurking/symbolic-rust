@@ -8,7 +8,7 @@ use crate::ast::{
 fn gen_op_div() -> AstOperator {
     AstOperator {
         symbol: "/".to_string(),
-        priority: 3_u32,
+        priority: 4_u32,
         descriptor: OperatorType::Div,
     }
 }
